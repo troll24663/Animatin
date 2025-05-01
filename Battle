@@ -1,0 +1,84 @@
+local ScreenGui = Instance.new("ScreenGui")
+local Frame = Instance.new("Frame")
+local TextBox = Instance.new("TextBox")
+local UltMove = Instance.new("TextButton")
+local VIP = Instance.new("TextButton")
+local PlayerLock = Instance.new("TextButton")
+
+--Properties:
+
+ScreenGui.Parent = game.CoreGui
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+Frame.Parent = ScreenGui
+Frame.BackgroundColor3 = Color3.fromRGB(48, 48, 48)
+Frame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Frame.BorderSizePixel = 0
+Frame.Position = UDim2.new(0.399323195, 0, 0.103112839, 0)
+Frame.Size = UDim2.new(0, 334, 0, 319)
+Frame.Active = true
+Frame.Draggable = true
+
+TextBox.Parent = Frame
+TextBox.BackgroundColor3 = Color3.fromRGB(85, 85, 85)
+TextBox.BorderColor3 = Color3.fromRGB(0, 0, 0)
+TextBox.BorderSizePixel = 0
+TextBox.Size = UDim2.new(0, 334, 0, 52)
+TextBox.Font = Enum.Font.SourceSans
+TextBox.Text = "Script By TRoll | Animator Battlegrounds"
+TextBox.TextColor3 = Color3.fromRGB(0, 0, 0)
+TextBox.TextSize = 21.000
+TextBox.TextStrokeTransparency = 0.500
+
+UltMove.Name = "UltMove"
+UltMove.Parent = Frame
+UltMove.BackgroundColor3 = Color3.fromRGB(122, 122, 122)
+UltMove.BorderColor3 = Color3.fromRGB(0, 0, 0)
+UltMove.BorderSizePixel = 0
+UltMove.Position = UDim2.new(0.059880238, 0, 0.190936238, 0)
+UltMove.Size = UDim2.new(0, 294, 0, 70)
+UltMove.Font = Enum.Font.SourceSans
+UltMove.Text = "Ult Move (wanna have ult)"
+UltMove.TextColor3 = Color3.fromRGB(0, 0, 0)
+UltMove.TextSize = 25.000
+UltMove.TextStrokeTransparency = 0.700
+UltMove.MouseButton1Down:Connect(function()
+	local args = {
+		[1] = "Move",
+		[2] = "EXTERMINATION"
+	}
+
+	game:GetService("ReplicatedStorage").Remotes.Replication:FireServer(unpack(args))
+end)
+
+VIP.Name = "VIP"
+VIP.Parent = Frame
+VIP.BackgroundColor3 = Color3.fromRGB(122, 122, 122)
+VIP.BorderColor3 = Color3.fromRGB(0, 0, 0)
+VIP.BorderSizePixel = 0
+VIP.Position = UDim2.new(0.059880238, 0, 0.432486326, 0)
+VIP.Size = UDim2.new(0, 294, 0, 69)
+VIP.Font = Enum.Font.SourceSans
+VIP.Text = "VIP | Chat work"
+VIP.TextColor3 = Color3.fromRGB(0, 0, 0)
+VIP.TextSize = 25.000
+VIP.TextStrokeTransparency = 0.700
+VIP.MouseButton1Down:Connect(function()
+	game:GetService("Players").LocalPlayer.VIP.Value=true
+end)
+
+PlayerLock.Name = "Player Lock"
+PlayerLock.Parent = Frame
+PlayerLock.BackgroundColor3 = Color3.fromRGB(122, 122, 122)
+PlayerLock.BorderColor3 = Color3.fromRGB(0, 0, 0)
+PlayerLock.BorderSizePixel = 0
+PlayerLock.Position = UDim2.new(0.059880238, 0, 0.667711616, 0)
+PlayerLock.Size = UDim2.new(0, 294, 0, 70)
+PlayerLock.Font = Enum.Font.SourceSans
+PlayerLock.Text = "Player Lock (Off Shift lock)"
+PlayerLock.TextColor3 = Color3.fromRGB(0, 0, 0)
+PlayerLock.TextSize = 25.000
+PlayerLock.TextStrokeTransparency = 0.700
+PlayerLock.MouseButton1Down:Connect(function()
+	print("Sry, this is Test")
+end)
