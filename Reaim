@@ -1,0 +1,1298 @@
+-- Krystal Dance V2 - Animation Selector GUI + Custom Animation
+-- Paste this as a LocalScript or run via executor
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local TweenService = game:GetService("TweenService")
+
+local Player = Players.LocalPlayer
+local Mouse = Player:GetMouse()
+
+repeat wait() until Player.Character
+local Character = Player.Character
+local Humanoid = Character:WaitForChild("Humanoid")
+local Root = Character:WaitForChild("HumanoidRootPart")
+local Torso = Character:WaitForChild("Torso")
+local Head = Character:WaitForChild("Head")
+local LeftArm = Character:WaitForChild("Left Arm")
+local RightArm = Character:WaitForChild("Right Arm")
+local LeftLeg = Character:WaitForChild("Left Leg")
+local RightLeg = Character:WaitForChild("Right Leg")
+
+local dancing = false
+local currentSound = nil
+local currentKey = nil
+local sine = 0
+local change = 0.5
+local ws = 14
+
+local function makeWeld(name, part0, part1, c0)
+    local w = Instance.new("ManualWeld")
+    w.Name = name
+    w.Part0 = part0
+    w.Part1 = part1
+    w.C0 = c0
+    w.Parent = part0
+    return w
+end
+
+local ROOTLERP = makeWeld("ROOTLERP", Root, Torso, CFrame.new(0,0,0))
+local HEADLERP = makeWeld("HEADLERP", Head, Head, CFrame.new(0,-1.5,0))
+local RIGHTARMLERP = makeWeld("RIGHTARMLERP", RightArm, Torso, CFrame.new(-1.5,0,0))
+local LEFTARMLERP = makeWeld("LEFTARMLERP", LeftArm, Torso, CFrame.new(1.5,0,0))
+local RIGHTLEGLERP = makeWeld("RIGHTLEGLERP", RightLeg, Torso, CFrame.new(-0.5,2,0))
+local LEFTLEGLERP = makeWeld("LEFTLEGLERP", LeftLeg, Torso, CFrame.new(0.5,2,0))
+
+local function swait(n)
+    n = n or 0
+    for i = 0, n do
+        RunService.Stepped:Wait()
+    end
+end
+
+local function stopDance()
+    dancing = false
+    if currentSound then
+        currentSound:Stop()
+        currentSound:Destroy()
+        currentSound = nil
+    end
+    Humanoid.WalkSpeed = ws
+    currentKey = nil
+end
+
+local function playSound(id, loop, timepos)
+    if currentSound then
+        currentSound:Stop()
+        currentSound:Destroy()
+    end
+    local s = Instance.new("Sound", Torso)
+    s.SoundId = "rbxassetid://" .. id
+    s.Volume = 6
+    s.Looped = loop or true
+    if timepos then s.TimePosition = timepos end
+    s:Play()
+    currentSound = s
+    return s
+end
+
+-- ==================== ANIMATIONS ====================
+local Animations = {}
+
+Animations["Q"] = { name = "The Swoosher", fn = function()
+    playSound("1532157598", true)
+    local spin = 0
+    while dancing do
+        spin = spin + 10
+        RIGHTLEGLERP.C0 = RIGHTLEGLERP.C0:lerp(CFrame.new(-0.52,1.9,-.35)*CFrame.Angles(math.rad(-30),0,0),.2)
+        LEFTLEGLERP.C0 = LEFTLEGLERP.C0:lerp(CFrame.new(0.52,1.9,.35)*CFrame.Angles(math.rad(30),0,0),.2)
+        ROOTLERP.C0 = ROOTLERP.C0:lerp(CFrame.new(.2*math.sin(sine/3),-.52,.2*math.sin(sine/4))*CFrame.Angles(math.rad(180),math.rad(spin),math.rad(15*math.sin(sine/9))),.2)
+        LEFTARMLERP.C0 = LEFTARMLERP.C0:lerp(CFrame.new(1.4,1.45,0)*CFrame.Angles(math.rad(180),math.rad(-1),math.rad(-3*math.sin(sine/2))),0.3)
+        RIGHTARMLERP.C0 = RIGHTARMLERP.C0:lerp(CFrame.new(-1.4,1.45,0)*CFrame.Angles(math.rad(180),math.rad(1),math.rad(3*math.sin(sine/2))),0.3)
+        swait()
+    end
+end}
+
+Animations["E"] = { name = "The Nutty", fn = function()
+    playSound("335701357", true, 10)
+    while dancing do
+        RIGHTLEGLERP.C0 = RIGHTLEGLERP.C0:lerp(CFrame.new(-0.3,2,0)*CFrame.Angles(0,0,math.rad(-10)),0.1)
+        LEFTLEGLERP.C0 = LEFTLEGLERP.C0:lerp(CFrame.new(0.3,2,0)*CFrame.Angles(0,0,math.rad(10)),0.1)
+        ROOTLERP.C0 = ROOTLERP.C0:lerp(CFrame.new(0,-.2,0)*CFrame.Angles(0,math.rad(15*math.sin(sine/4)),0),.2)
+        RIGHTARMLERP.C0 = RIGHTARMLERP.C0:lerp(CFrame.new(-1.3+.3*math.sin(sine/3.5),.5*-math.sin(sine/3.5),.1)*CFrame.Angles(0,0,math.rad(30*math.sin(sine/3.5))),.2)
+        LEFTARMLERP.C0 = LEFTARMLERP.C0:lerp(CFrame.new(1.3+.3*math.sin(sine/3.5),.5*math.sin(sine/3.5),.1)*CFrame.Angles(0,0,math.rad(30*math.sin(sine/3.5))),.2)
+        swait()
+    end
+end}
+
+Animations["R"] = { name = "Spin Me Round", fn = function()
+    playSound("145799973", true)
+    local rec = 0
+    while dancing do
+        rec = rec + 10
+        RIGHTLEGLERP.C0 = RIGHTLEGLERP.C0:lerp(CFrame.new(-0.27,2,.1*math.sin(sine/4))*CFrame.Angles(math.rad(10*math.sin(sine/4)),0,math.rad(-8)),0.3)
+        LEFTLEGLERP.C0 = LEFTLEGLERP.C0:lerp(CFrame.new(0.27,2,-.1*math.sin(sine/4))*CFrame.Angles(math.rad(-10*math.sin(sine/4)),0,math.rad(8)),0.3)
+        ROOTLERP.C0 = ROOTLERP.C0:lerp(CFrame.new(.5*math.sin(sine/5),-.2,.5*math.sin(sine/4))*CFrame.Angles(0,math.rad(rec),0),.3)
+        RIGHTARMLERP.C0 = RIGHTARMLERP.C0:lerp(CFrame.new(-.5,1.98,0)*CFrame.Angles(0,0,math.rad(-90)),.3)
+        LEFTARMLERP.C0 = LEFTARMLERP.C0:lerp(CFrame.new(.5,1.98,0)*CFrame.Angles(0,0,math.rad(90)),.3)
+        swait()
+    end
+end}
+
+Animations["T"] = { name = "Plum Juice Dance", fn = function()
+    playSound("2526093213", true)
+    while dancing do
+        for i = 1, 20 do if not dancing then break end
+            RIGHTLEGLERP.C0 = RIGHTLEGLERP.C0:lerp(CFrame.new(-0.33,2,.05)*CFrame.Angles(math.rad(3),0,math.rad(-8)),0.2)
+            LEFTLEGLERP.C0 = LEFTLEGLERP.C0:lerp(CFrame.new(0.33,2,-.05)*CFrame.Angles(math.rad(-3),0,math.rad(8)),0.2)
+            ROOTLERP.C0 = ROOTLERP.C0:lerp(CFrame.new(0,-.2,0)*CFrame.Angles(0,0,math.rad(15)),.2)
+            RIGHTARMLERP.C0 = RIGHTARMLERP.C0:lerp(CFrame.new(.5,1.98,.05)*CFrame.Angles(0,0,math.rad(-140)),.2)
+            LEFTARMLERP.C0 = LEFTARMLERP.C0:lerp(CFrame.new(1,1.3,.05)*CFrame.Angles(0,0,math.rad(50)),.2)
+            swait()
+        end
+        for i = 1, 20 do if not dancing then break end
+            RIGHTLEGLERP.C0 = RIGHTLEGLERP.C0:lerp(CFrame.new(-0.33,2,.05)*CFrame.Angles(math.rad(3),0,math.rad(-8)),0.2)
+            LEFTLEGLERP.C0 = LEFTLEGLERP.C0:lerp(CFrame.new(0.33,2,-.05)*CFrame.Angles(math.rad(-3),0,math.rad(8)),0.2)
+            ROOTLERP.C0 = ROOTLERP.C0:lerp(CFrame.new(0,-.2,0)*CFrame.Angles(0,0,math.rad(-15)),.2)
+            RIGHTARMLERP.C0 = RIGHTARMLERP.C0:lerp(CFrame.new(-1,1.4,.05)*CFrame.Angles(0,0,math.rad(-50)),.2)
+            LEFTARMLERP.C0 = LEFTARMLERP.C0:lerp(CFrame.new(-.6,2,.05)*CFrame.Angles(0,0,math.rad(140)),.2)
+            swait()
+        end
+    end
+end}
+
+Animations["Y"] = { name = "Moonwalk", fn = function()
+    playSound("487872908", true, 13.98)
+    local walkforward = 0
+    local walkrotation = 0
+    while dancing do
+        for i = 1, 100 do if not dancing then break end
+            walkforward = walkforward + .1
+            RIGHTLEGLERP.C0 = RIGHTLEGLERP.C0:lerp(CFrame.new(-0.31,2.05,.1*math.sin(sine/4))*CFrame.Angles(math.rad(10*math.sin(sine/4)),0,math.rad(-8)),0.3)
+            LEFTLEGLERP.C0 = LEFTLEGLERP.C0:lerp(CFrame.new(0.31,2.05,-.15*math.sin(sine/4))*CFrame.Angles(math.rad(-10*math.sin(sine/4)),0,math.rad(8)),0.3)
+            ROOTLERP.C0 = ROOTLERP.C0:lerp(CFrame.new(0,-.2,walkforward)*CFrame.Angles(0,0,0),.2)
+            RIGHTARMLERP.C0 = RIGHTARMLERP.C0:lerp(CFrame.new(-1.5,0,0)*CFrame.Angles(0,0,0),.3)
+            LEFTARMLERP.C0 = LEFTARMLERP.C0:lerp(CFrame.new(1.5,0,0)*CFrame.Angles(0,0,0),.3)
+            swait()
+        end
+        for i = 1, 50 do if not dancing then break end
+            walkrotation = walkrotation + 15
+            ROOTLERP.C0 = ROOTLERP.C0:lerp(CFrame.new(0,-.2,walkforward)*CFrame.Angles(0,math.rad(walkrotation),0),.2)
+            swait()
+        end
+        walkrotation = 0
+        for i = 1, 100 do if not dancing then break end
+            walkforward = walkforward - .1
+            RIGHTLEGLERP.C0 = RIGHTLEGLERP.C0:lerp(CFrame.new(-0.31,2,.1*math.sin(sine/4))*CFrame.Angles(math.rad(10*math.sin(sine/4)),0,math.rad(-8)),0.3)
+            LEFTLEGLERP.C0 = LEFTLEGLERP.C0:lerp(CFrame.new(0.31,2,-.15*math.sin(sine/4))*CFrame.Angles(math.rad(-10*math.sin(sine/4)),0,math.rad(8)),0.3)
+            ROOTLERP.C0 = ROOTLERP.C0:lerp(CFrame.new(0,-.2,walkforward)*CFrame.Angles(0,math.rad(-180),0),.2)
+            RIGHTARMLERP.C0 = RIGHTARMLERP.C0:lerp(CFrame.new(-1.3,.7,.2)*CFrame.Angles(math.rad(220),0,math.rad(-30)),0.4)
+            LEFTARMLERP.C0 = LEFTARMLERP.C0:lerp(CFrame.new(1.5,0,0)*CFrame.Angles(0,0,0),.3)
+            swait()
+        end
+        for i = 1, 50 do if not dancing then break end
+            walkrotation = walkrotation + 15
+            ROOTLERP.C0 = ROOTLERP.C0:lerp(CFrame.new(0,-.2,walkforward)*CFrame.Angles(0,math.rad(walkrotation),0),.2)
+            swait()
+        end
+        walkrotation = 0
+    end
+end}
+
+Animations["U"] = { name = "Slav Dance", fn = function()
+    playSound("2341226836", true)
+    while dancing do
+        for i = 1, 17 do if not dancing then break end
+            RIGHTLEGLERP.C0 = RIGHTLEGLERP.C0:lerp(CFrame.new(-0.52,1.5,-.5)*CFrame.Angles(math.rad(-60),0,0),.2)
+            LEFTLEGLERP.C0 = LEFTLEGLERP.C0:lerp(CFrame.new(0.52,1.2,.55)*CFrame.Angles(math.rad(30),0,0),.2)
+            ROOTLERP.C0 = ROOTLERP.C0:lerp(CFrame.new(0,-.8+.1*math.sin(sine/3),0)*CFrame.Angles(math.rad(22-2*math.sin(sine/3)),0,0),.2)
+            LEFTARMLERP.C0 = LEFTARMLERP.C0:lerp(CFrame.new(1,-.2,.4)*CFrame.Angles(math.rad(-87),math.rad(80),0),0.3)
+            RIGHTARMLERP.C0 = RIGHTARMLERP.C0:lerp(CFrame.new(-.7,-.2,.4)*CFrame.Angles(math.rad(-87),math.rad(-88),0),0.3)
+            swait()
+        end
+        for i = 1, 17 do if not dancing then break end
+            RIGHTLEGLERP.C0 = RIGHTLEGLERP.C0:lerp(CFrame.new(-0.52,1.2,.55)*CFrame.Angles(math.rad(30),0,0),.2)
+            LEFTLEGLERP.C0 = LEFTLEGLERP.C0:lerp(CFrame.new(0.52,1.5,-.5)*CFrame.Angles(math.rad(-60),0,0),.2)
+            ROOTLERP.C0 = ROOTLERP.C0:lerp(CFrame.new(0,-.8+.1*math.sin(sine/3),0)*CFrame.Angles(math.rad(22-2*math.sin(sine/3)),0,0),.2)
+            LEFTARMLERP.C0 = LEFTARMLERP.C0:lerp(CFrame.new(1,-.2,.4)*CFrame.Angles(math.rad(-87),math.rad(80),0),0.3)
+            RIGHTARMLERP.C0 = RIGHTARMLERP.C0:lerp(CFrame.new(-.7,-.2,.4)*CFrame.Angles(math.rad(-87),math.rad(-88),0),0.3)
+            swait()
+        end
+    end
+end}
+
+Animations["P"] = { name = "Barrel Roll", fn = function()
+    playSound("505320170", true)
+    while dancing do
+        ROOTLERP.C0 = ROOTLERP.C0:lerp(CFrame.new(5*math.sin(sine/8),-1.8,0)*CFrame.Angles(math.rad(-90),math.rad(180*math.sin(sine/8)),0),.25)
+        RIGHTARMLERP.C0 = RIGHTARMLERP.C0:lerp(CFrame.new(-1.5,1.5,0)*CFrame.Angles(math.rad(180),0,0),.25)
+        LEFTARMLERP.C0 = LEFTARMLERP.C0:lerp(CFrame.new(1.5,1.5,0)*CFrame.Angles(math.rad(180),0,0),.25)
+        LEFTLEGLERP.C0 = LEFTLEGLERP.C0:lerp(CFrame.new(.5,2,0)*CFrame.Angles(0,0,0),.25)
+        RIGHTLEGLERP.C0 = RIGHTLEGLERP.C0:lerp(CFrame.new(-.5,2,0)*CFrame.Angles(0,0,0),.25)
+        swait()
+    end
+end}
+
+Animations["F"] = { name = "The Jerky", fn = function()
+    playSound("138211362", true)
+    while dancing do
+        ROOTLERP.C0 = ROOTLERP.C0:lerp(CFrame.new(0,-.4,0)*CFrame.Angles(math.rad(20+5*math.sin(sine/2)),math.rad(10*math.sin(sine/4)),0),.25)
+        RIGHTARMLERP.C0 = RIGHTARMLERP.C0:lerp(CFrame.new(-1.5,.89-.4*-math.sin(sine/2),.49)*CFrame.Angles(math.rad(-70+20*-math.sin(sine/2)),0,0),.25)
+        LEFTARMLERP.C0 = LEFTARMLERP.C0:lerp(CFrame.new(1.5,.89-.4*math.sin(sine/2),.49)*CFrame.Angles(math.rad(-70+20*math.sin(sine/2)),0,0),.25)
+        RIGHTLEGLERP.C0 = RIGHTLEGLERP.C0:lerp(CFrame.new(-0.33,2,-.2+.3*math.sin(sine/2))*CFrame.Angles(math.rad(-20-20*-math.sin(sine/2)),0,math.rad(-8)),0.25)
+        LEFTLEGLERP.C0 = LEFTLEGLERP.C0:lerp(CFrame.new(0.33,2,-.2-.3*math.sin(sine/2))*CFrame.Angles(math.rad(-20-20*math.sin(sine/2)),0,math.rad(8)),0.25)
+        swait()
+    end
+end}
+
+Animations["G"] = { name = "The Shuffle", fn = function()
+    playSound("168166611", true)
+    while dancing do
+        ROOTLERP.C0 = ROOTLERP.C0:lerp(CFrame.new(2*math.sin(sine/9),-.4+.1*math.sin(sine/3),0)*CFrame.Angles(0,math.rad(20*math.sin(sine/9)),0),.25)
+        for i = 1, 28 do if not dancing then break end
+            RIGHTARMLERP.C0 = RIGHTARMLERP.C0:lerp(CFrame.new(-.9,.65+.4*math.sin(sine/12),1.2)*CFrame.Angles(math.rad(-35-15*math.sin(sine/12)),math.rad(50),0),.2)
+            LEFTARMLERP.C0 = LEFTARMLERP.C0:lerp(CFrame.new(1.2,1.5,0)*CFrame.Angles(math.rad(180-7*math.sin(sine/3)),math.rad(7*math.sin(sine/3)),math.rad(7*math.sin(sine/3))),.2)
+            RIGHTLEGLERP.C0 = RIGHTLEGLERP.C0:lerp(CFrame.new(-0.5,.7,1)*CFrame.Angles(math.rad(75-10*math.sin(sine/2)),0,0),0.25)
+            LEFTLEGLERP.C0 = LEFTLEGLERP.C0:lerp(CFrame.new(0.31,2.05,-.1)*CFrame.Angles(math.rad(10),0,math.rad(-2)),0.3)
+            swait()
+        end
+        for i = 1, 28 do if not dancing then break end
+            RIGHTARMLERP.C0 = RIGHTARMLERP.C0:lerp(CFrame.new(-.9,.65+.4*math.sin(sine/12),1.2)*CFrame.Angles(math.rad(-35-15*math.sin(sine/12)),math.rad(50),0),.2)
+            LEFTARMLERP.C0 = LEFTARMLERP.C0:lerp(CFrame.new(1.2,1.5,0)*CFrame.Angles(math.rad(180-7*math.sin(sine/3)),math.rad(7*math.sin(sine/3)),math.rad(7*math.sin(sine/3))),.2)
+            RIGHTLEGLERP.C0 = RIGHTLEGLERP.C0:lerp(CFrame.new(-0.31,2.05,.1)*CFrame.Angles(math.rad(-10),0,math.rad(-8)),0.25)
+            LEFTLEGLERP.C0 = LEFTLEGLERP.C0:lerp(CFrame.new(0.5,.7,1.1)*CFrame.Angles(math.rad(75-10*math.sin(sine/2)),0,math.rad(-2)),0.25)
+            swait()
+        end
+    end
+end}
+
+Animations["H"] = { name = "The Spongebob", fn = function()
+    playSound("840189092", true, 14.8)
+    while dancing do
+        for i = 1, 15 do if not dancing then break end
+            ROOTLERP.C0 = ROOTLERP.C0:lerp(CFrame.new(.5,-.4+.1*math.sin(sine/4),0)*CFrame.Angles(0,math.rad(20*math.sin(sine/8)),math.rad(20)),.25)
+            RIGHTARMLERP.C0 = RIGHTARMLERP.C0:lerp(CFrame.new(-.9,.65+.4*math.sin(sine/12),1.2)*CFrame.Angles(math.rad(-35-15*math.sin(sine/12)),math.rad(50),0),.3)
+            LEFTARMLERP.C0 = LEFTARMLERP.C0:lerp(CFrame.new(.9,.65+.4*math.sin(sine/12),1.2)*CFrame.Angles(math.rad(-35-15*math.sin(sine/12)),math.rad(-50),0),.3)
+            RIGHTLEGLERP.C0 = RIGHTLEGLERP.C0:lerp(CFrame.new(0.25,2.05,0)*CFrame.Angles(0,0,math.rad(-35)),0.25)
+            LEFTLEGLERP.C0 = LEFTLEGLERP.C0:lerp(CFrame.new(0.31,2.05,0)*CFrame.Angles(0,0,math.rad(14)),0.25)
+            swait()
+        end
+        for i = 1, 15 do if not dancing then break end
+            ROOTLERP.C0 = ROOTLERP.C0:lerp(CFrame.new(0,-.1*math.sin(sine/4),0)*CFrame.Angles(0,math.rad(20*math.sin(sine/8)),0),.25)
+            RIGHTLEGLERP.C0 = RIGHTLEGLERP.C0:lerp(CFrame.new(-0.25,.7,1.5)*CFrame.Angles(math.rad(72),math.rad(25),math.rad(-2)),0.25)
+            LEFTLEGLERP.C0 = LEFTLEGLERP.C0:lerp(CFrame.new(0.3,2,0)*CFrame.Angles(0,0,math.rad(10)),0.25)
+            swait()
+        end
+        for i = 1, 15 do if not dancing then break end
+            ROOTLERP.C0 = ROOTLERP.C0:lerp(CFrame.new(-.5,-.4+.1*math.sin(sine/4),0)*CFrame.Angles(0,math.rad(20*math.sin(sine/8)),math.rad(-20)),.25)
+            RIGHTARMLERP.C0 = RIGHTARMLERP.C0:lerp(CFrame.new(-.9,.65+.4*math.sin(sine/12),1.2)*CFrame.Angles(math.rad(-35-15*math.sin(sine/12)),math.rad(50),0),.3)
+            LEFTARMLERP.C0 = LEFTARMLERP.C0:lerp(CFrame.new(.9,.65+.4*math.sin(sine/12),1.2)*CFrame.Angles(math.rad(-35-15*math.sin(sine/12)),math.rad(-50),0),.3)
+            RIGHTLEGLERP.C0 = RIGHTLEGLERP.C0:lerp(CFrame.new(-0.3,2,0)*CFrame.Angles(0,0,math.rad(-10)),0.25)
+            LEFTLEGLERP.C0 = LEFTLEGLERP.C0:lerp(CFrame.new(-0.25,2.05,0)*CFrame.Angles(0,0,math.rad(35)),0.25)
+            swait()
+        end
+        for i = 1, 15 do if not dancing then break end
+            ROOTLERP.C0 = ROOTLERP.C0:lerp(CFrame.new(-.5,-.1,0)*CFrame.Angles(0,math.rad(20*math.sin(sine/8)),0),.25)
+            RIGHTLEGLERP.C0 = RIGHTLEGLERP.C0:lerp(CFrame.new(-0.31,2.05,0)*CFrame.Angles(0,0,math.rad(-14)),0.3)
+            LEFTLEGLERP.C0 = LEFTLEGLERP.C0:lerp(CFrame.new(0.25,.7,1.5)*CFrame.Angles(math.rad(72),math.rad(-25),math.rad(-2)),0.25)
+            swait()
+        end
+    end
+end}
+
+Animations["J"] = { name = "Here Comes the Money", fn = function()
+    playSound("2426693638", true)
+    while dancing do
+        ROOTLERP.C0 = ROOTLERP.C0:lerp(CFrame.new(0,-.3,0)*CFrame.Angles(math.rad(20),0,0),.25)
+        LEFTARMLERP.C0 = LEFTARMLERP.C0:lerp(CFrame.new(1,.5+.5*math.sin(sine/2),.5)*CFrame.Angles(math.rad(-97),math.rad(40-20*math.sin(sine/2)),0),0.25)
+        RIGHTARMLERP.C0 = RIGHTARMLERP.C0:lerp(CFrame.new(-1,.5,.5)*CFrame.Angles(math.rad(-87),math.rad(-20),0),0.25)
+        RIGHTLEGLERP.C0 = RIGHTLEGLERP.C0:lerp(CFrame.new(-0.3,2,.5)*CFrame.Angles(math.rad(20),0,math.rad(-10)),0.25)
+        LEFTLEGLERP.C0 = LEFTLEGLERP.C0:lerp(CFrame.new(0.3,2,.5)*CFrame.Angles(math.rad(20),0,math.rad(10)),0.25)
+        swait()
+    end
+end}
+
+Animations["K"] = { name = "Runnin' in the 90s", fn = function()
+    playSound("665751753", true, 22.3)
+    local lol90 = 0
+    while dancing do
+        lol90 = lol90 + 11
+        ROOTLERP.C0 = ROOTLERP.C0:lerp(CFrame.new(1*math.sin(sine/10),.1+.8*math.sin(sine/3),0)*CFrame.Angles(0,0,math.rad(8*math.sin(sine/7))),.25)
+        ROOTLERP.C1 = ROOTLERP.C1:lerp(CFrame.new(0,0,0)*CFrame.Angles(0,math.rad(lol90),0),.25)
+        LEFTARMLERP.C0 = LEFTARMLERP.C0:lerp(CFrame.new(1.4,1.45,0)*CFrame.Angles(math.rad(180),math.rad(-5*math.sin(sine/3)),math.rad(-6*math.sin(sine/3))),0.25)
+        RIGHTARMLERP.C0 = RIGHTARMLERP.C0:lerp(CFrame.new(-1.4,1.45,0)*CFrame.Angles(math.rad(180),math.rad(5*math.sin(sine/3)),math.rad(6*math.sin(sine/3))),0.25)
+        RIGHTLEGLERP.C0 = RIGHTLEGLERP.C0:lerp(CFrame.new(-0.3,2,0)*CFrame.Angles(0,0,math.rad(-10+5*math.sin(sine/3))),0.25)
+        LEFTLEGLERP.C0 = LEFTLEGLERP.C0:lerp(CFrame.new(0.3,2,0)*CFrame.Angles(0,0,math.rad(10-5*math.sin(sine/3))),0.25)
+        swait()
+    end
+    ROOTLERP.C1 = CFrame.new(0,0,0)
+end}
+
+-- ==================== YOUR CUSTOM 55 KEYFRAME ANIMATION ====================
+Animations["Z"] = { name = "Peak", fn = function()
+    playSound("145799973", true)
+    while dancing do
+        for i = 1, 20 do
+            if not dancing then break end
+            ROOTLERP.C0 = ROOTLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(0), math.rad(0), math.rad(0)), 0.25)
+            HEADLERP.C0 = HEADLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(-14.109), math.rad(4.451), math.rad(74.262)), 0.25)
+            RIGHTARMLERP.C0 = RIGHTARMLERP.C0:lerp(CFrame.new(0.291, -0.749, 0.623) * CFrame.Angles(math.rad(-106.91), math.rad(-17.725), math.rad(101.983)), 0.25)
+            LEFTARMLERP.C0 = LEFTARMLERP.C0:lerp(CFrame.new(-0.29, -1.05, 0.249) * CFrame.Angles(math.rad(-70.195), math.rad(37.964), math.rad(-109.238)), 0.25)
+            RIGHTLEGLERP.C0 = RIGHTLEGLERP.C0:lerp(CFrame.new(0.022, 0.032, 0.097) * CFrame.Angles(math.rad(5.41), math.rad(-30.198), math.rad(-2.162)), 0.25)
+            LEFTLEGLERP.C0 = LEFTLEGLERP.C0:lerp(CFrame.new(-0.846, 0.002, 0.055) * CFrame.Angles(math.rad(-5.042), math.rad(3.521), math.rad(51.572)), 0.25)
+            swait()
+        end
+
+        -- Keyframe 2  (time: 0.033s)
+        for i = 1, 20 do
+            if not dancing then break end
+            ROOTLERP.C0 = ROOTLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(0), math.rad(0), math.rad(0)), 0.25)
+            HEADLERP.C0 = HEADLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(-16.257), math.rad(5.498), math.rad(68.939)), 0.25)
+            RIGHTARMLERP.C0 = RIGHTARMLERP.C0:lerp(CFrame.new(0.156, -0.731, 0.501) * CFrame.Angles(math.rad(-97.269), math.rad(-6.85), math.rad(91.375)), 0.25)
+            LEFTARMLERP.C0 = LEFTARMLERP.C0:lerp(CFrame.new(-0.284, -0.986, 0.208) * CFrame.Angles(math.rad(-67.911), math.rad(22.473), math.rad(-101.732)), 0.25)
+            RIGHTLEGLERP.C0 = RIGHTLEGLERP.C0:lerp(CFrame.new(-0.01, 0.072, 0.114) * CFrame.Angles(math.rad(-0.433), math.rad(-32.754), math.rad(-1.642)), 0.25)
+            LEFTLEGLERP.C0 = LEFTLEGLERP.C0:lerp(CFrame.new(-0.708, 0.048, 0.039) * CFrame.Angles(math.rad(-8.311), math.rad(3.336), math.rad(39.428)), 0.25)
+            swait()
+        end
+
+        -- Keyframe 3  (time: 0.067s)
+        for i = 1, 20 do
+            if not dancing then break end
+            ROOTLERP.C0 = ROOTLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(0), math.rad(0), math.rad(0)), 0.25)
+            HEADLERP.C0 = HEADLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(-21.444), math.rad(8.111), math.rad(56.736)), 0.25)
+            RIGHTARMLERP.C0 = RIGHTARMLERP.C0:lerp(CFrame.new(-0.181, -0.709, 0.232) * CFrame.Angles(math.rad(-59.405), math.rad(11.771), math.rad(48.966)), 0.25)
+            LEFTARMLERP.C0 = LEFTARMLERP.C0:lerp(CFrame.new(-0.197, -0.86, 0.114) * CFrame.Angles(math.rad(-52.66), math.rad(-16.765), math.rad(-69.439)), 0.25)
+            RIGHTLEGLERP.C0 = RIGHTLEGLERP.C0:lerp(CFrame.new(-0.11, 0.131, 0.103) * CFrame.Angles(math.rad(-16.33), math.rad(-37.984), math.rad(-3.019)), 0.25)
+            LEFTLEGLERP.C0 = LEFTLEGLERP.C0:lerp(CFrame.new(0.02, 0.032, -0.001) * CFrame.Angles(math.rad(-12.446), math.rad(4.918), math.rad(4.607)), 0.25)
+            swait()
+        end
+
+        -- Keyframe 4  (time: 0.1s)
+        for i = 1, 20 do
+            if not dancing then break end
+            ROOTLERP.C0 = ROOTLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(0), math.rad(0), math.rad(0)), 0.25)
+            HEADLERP.C0 = HEADLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(-28.915), math.rad(11.234), math.rad(42.588)), 0.25)
+            RIGHTARMLERP.C0 = RIGHTARMLERP.C0:lerp(CFrame.new(-0.57, -0.636, -0.107) * CFrame.Angles(math.rad(-18.555), math.rad(-1.73), math.rad(-2.32)), 0.25)
+            LEFTARMLERP.C0 = LEFTARMLERP.C0:lerp(CFrame.new(0.055, -0.659, 0.004) * CFrame.Angles(math.rad(-15.348), math.rad(-17.749), math.rad(-6.663)), 0.25)
+            RIGHTLEGLERP.C0 = RIGHTLEGLERP.C0:lerp(CFrame.new(-0.003, 0.315, 0.154) * CFrame.Angles(math.rad(-39.065), math.rad(-40.544), math.rad(-17.161)), 0.25)
+            LEFTLEGLERP.C0 = LEFTLEGLERP.C0:lerp(CFrame.new(0.033, -0.002, 0.011) * CFrame.Angles(math.rad(-18.326), math.rad(8.176), math.rad(-3.723)), 0.25)
+            swait()
+        end
+
+        -- Keyframe 5  (time: 0.133s)
+        for i = 1, 20 do
+            if not dancing then break end
+            ROOTLERP.C0 = ROOTLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(0), math.rad(0), math.rad(0)), 0.25)
+            HEADLERP.C0 = HEADLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(-38.713), math.rad(8.971), math.rad(34.11)), 0.25)
+            RIGHTARMLERP.C0 = RIGHTARMLERP.C0:lerp(CFrame.new(-0.754, -0.476, -0.279) * CFrame.Angles(math.rad(-10.128), math.rad(-11.949), math.rad(-28.639)), 0.25)
+            LEFTARMLERP.C0 = LEFTARMLERP.C0:lerp(CFrame.new(0.4, -0.432, -0.089) * CFrame.Angles(math.rad(-7.451), math.rad(-2.701), math.rad(27.463)), 0.25)
+            RIGHTLEGLERP.C0 = RIGHTLEGLERP.C0:lerp(CFrame.new(0.235, 0.457, 0.114) * CFrame.Angles(math.rad(-46.557), math.rad(-29.784), math.rad(-14.008)), 0.25)
+            LEFTLEGLERP.C0 = LEFTLEGLERP.C0:lerp(CFrame.new(0.027, -0.009, 0.039) * CFrame.Angles(math.rad(-29.962), math.rad(20.441), math.rad(7.028)), 0.25)
+            swait()
+        end
+
+        -- Keyframe 6  (time: 0.167s)
+        for i = 1, 20 do
+            if not dancing then break end
+            ROOTLERP.C0 = ROOTLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(0), math.rad(0), math.rad(0)), 0.25)
+            HEADLERP.C0 = HEADLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(-41.63), math.rad(12.329), math.rad(9.709)), 0.25)
+            RIGHTARMLERP.C0 = RIGHTARMLERP.C0:lerp(CFrame.new(-0.757, -0.301, -0.279) * CFrame.Angles(math.rad(-12.311), math.rad(-9.166), math.rad(-43.842)), 0.25)
+            LEFTARMLERP.C0 = LEFTARMLERP.C0:lerp(CFrame.new(0.795, -0.294, -0.116) * CFrame.Angles(math.rad(-4.486), math.rad(-7.308), math.rad(43.92)), 0.25)
+            RIGHTLEGLERP.C0 = RIGHTLEGLERP.C0:lerp(CFrame.new(0.31, 0.368, 0.187) * CFrame.Angles(math.rad(-43.354), math.rad(-23.636), math.rad(-17.698)), 0.25)
+            LEFTLEGLERP.C0 = LEFTLEGLERP.C0:lerp(CFrame.new(-0.306, 0.033, 0.363) * CFrame.Angles(math.rad(-31.871), math.rad(20.707), math.rad(18.719)), 0.25)
+            swait()
+        end
+
+        -- Keyframe 7  (time: 0.2s)
+        for i = 1, 20 do
+            if not dancing then break end
+            ROOTLERP.C0 = ROOTLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(0), math.rad(0), math.rad(0)), 0.25)
+            HEADLERP.C0 = HEADLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(-33.506), math.rad(14.755), math.rad(-12.607)), 0.25)
+            RIGHTARMLERP.C0 = RIGHTARMLERP.C0:lerp(CFrame.new(-0.745, -0.215, -0.265) * CFrame.Angles(math.rad(-12.631), math.rad(-4.408), math.rad(-50.208)), 0.25)
+            LEFTARMLERP.C0 = LEFTARMLERP.C0:lerp(CFrame.new(0.995, -0.254, -0.117) * CFrame.Angles(math.rad(-2.284), math.rad(-11.366), math.rad(49.078)), 0.25)
+            RIGHTLEGLERP.C0 = RIGHTLEGLERP.C0:lerp(CFrame.new(0.272, 0.168, 0.257) * CFrame.Angles(math.rad(-34.443), math.rad(-15.616), math.rad(-20.308)), 0.25)
+            LEFTLEGLERP.C0 = LEFTLEGLERP.C0:lerp(CFrame.new(-0.329, 0.056, 0.363) * CFrame.Angles(math.rad(-29.349), math.rad(21.24), math.rad(19.47)), 0.25)
+            swait()
+        end
+
+        -- Keyframe 8  (time: 0.233s)
+        for i = 1, 20 do
+            if not dancing then break end
+            ROOTLERP.C0 = ROOTLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(0), math.rad(0), math.rad(0)), 0.25)
+            HEADLERP.C0 = HEADLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(-20.463), math.rad(12.8), math.rad(-28.024)), 0.25)
+            RIGHTARMLERP.C0 = RIGHTARMLERP.C0:lerp(CFrame.new(-0.74, -0.237, -0.188) * CFrame.Angles(math.rad(-8.304), math.rad(3.603), math.rad(-46.435)), 0.25)
+            LEFTARMLERP.C0 = LEFTARMLERP.C0:lerp(CFrame.new(0.919, -0.341, -0.114) * CFrame.Angles(math.rad(-5.662), math.rad(-10.683), math.rad(29.082)), 0.25)
+            RIGHTLEGLERP.C0 = RIGHTLEGLERP.C0:lerp(CFrame.new(0.145, 0.007, 0.271) * CFrame.Angles(math.rad(-23.852), math.rad(-8.499), math.rad(-22.527)), 0.25)
+            LEFTLEGLERP.C0 = LEFTLEGLERP.C0:lerp(CFrame.new(-0.348, 0.057, 0.39) * CFrame.Angles(math.rad(-20.591), math.rad(23.219), math.rad(22.435)), 0.25)
+            swait()
+        end
+
+        -- Keyframe 9  (time: 0.267s)
+        for i = 1, 20 do
+            if not dancing then break end
+            ROOTLERP.C0 = ROOTLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(0), math.rad(0), math.rad(0)), 0.25)
+            HEADLERP.C0 = HEADLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(-7.163), math.rad(8.585), math.rad(-35.102)), 0.25)
+            RIGHTARMLERP.C0 = RIGHTARMLERP.C0:lerp(CFrame.new(-0.709, -0.387, -0.022) * CFrame.Angles(math.rad(-4.735), math.rad(19.215), math.rad(-25.866)), 0.25)
+            LEFTARMLERP.C0 = LEFTARMLERP.C0:lerp(CFrame.new(0.694, -0.478, -0.099) * CFrame.Angles(math.rad(-10.003), math.rad(-5.825), math.rad(-13.139)), 0.25)
+            RIGHTLEGLERP.C0 = RIGHTLEGLERP.C0:lerp(CFrame.new(0.528, -0.152, 0.316) * CFrame.Angles(math.rad(-15.138), math.rad(-2.709), math.rad(-43.341)), 0.25)
+            LEFTLEGLERP.C0 = LEFTLEGLERP.C0:lerp(CFrame.new(-0.362, -0.005, 0.423) * CFrame.Angles(math.rad(-11.211), math.rad(26.162), math.rad(28.152)), 0.25)
+            swait()
+        end
+
+        -- Keyframe 10  (time: 0.3s)
+        for i = 1, 20 do
+            if not dancing then break end
+            ROOTLERP.C0 = ROOTLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(0), math.rad(0), math.rad(0)), 0.25)
+            HEADLERP.C0 = HEADLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(3.513), math.rad(5.12), math.rad(-35.469)), 0.25)
+            RIGHTARMLERP.C0 = RIGHTARMLERP.C0:lerp(CFrame.new(-0.374, -0.83, 0.187) * CFrame.Angles(math.rad(-37.545), math.rad(36.079), math.rad(34.85)), 0.25)
+            LEFTARMLERP.C0 = LEFTARMLERP.C0:lerp(CFrame.new(0.385, -0.536, -0.078) * CFrame.Angles(math.rad(-3.564), math.rad(-2.829), math.rad(-55.777)), 0.25)
+            RIGHTLEGLERP.C0 = RIGHTLEGLERP.C0:lerp(CFrame.new(0.891, -0.284, 0.264) * CFrame.Angles(math.rad(-8.179), math.rad(2.358), math.rad(-65.235)), 0.25)
+            LEFTLEGLERP.C0 = LEFTLEGLERP.C0:lerp(CFrame.new(-0.176, -0.051, 0.433) * CFrame.Angles(math.rad(-8.336), math.rad(39.42), math.rad(33.173)), 0.25)
+            swait()
+        end
+
+        -- Keyframe 11  (time: 0.333s)
+        for i = 1, 20 do
+            if not dancing then break end
+            ROOTLERP.C0 = ROOTLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(0), math.rad(0), math.rad(0)), 0.25)
+            HEADLERP.C0 = HEADLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(8.931), math.rad(-0.248), math.rad(-31.43)), 0.25)
+            RIGHTARMLERP.C0 = RIGHTARMLERP.C0:lerp(CFrame.new(-0.027, -1.108, 0.322) * CFrame.Angles(math.rad(-72.409), math.rad(16.31), math.rad(83.803)), 0.25)
+            LEFTARMLERP.C0 = LEFTARMLERP.C0:lerp(CFrame.new(0.129, -0.534, -0.055) * CFrame.Angles(math.rad(7.65), math.rad(-9.613), math.rad(-93.783)), 0.25)
+            RIGHTLEGLERP.C0 = RIGHTLEGLERP.C0:lerp(CFrame.new(1.122, -0.203, 0.136) * CFrame.Angles(math.rad(-2.819), math.rad(7.758), math.rad(-76.244)), 0.25)
+            LEFTLEGLERP.C0 = LEFTLEGLERP.C0:lerp(CFrame.new(0.135, 0.005, 0.253) * CFrame.Angles(math.rad(-12.079), math.rad(55.669), math.rad(34.07)), 0.25)
+            swait()
+        end
+
+        -- Keyframe 12  (time: 0.367s)
+        for i = 1, 20 do
+            if not dancing then break end
+            ROOTLERP.C0 = ROOTLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(0), math.rad(0), math.rad(0)), 0.25)
+            HEADLERP.C0 = HEADLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(8.841), math.rad(-6.332), math.rad(-27.468)), 0.25)
+            RIGHTARMLERP.C0 = RIGHTARMLERP.C0:lerp(CFrame.new(0.037, -0.946, 0.348) * CFrame.Angles(math.rad(-81.609), math.rad(3.691), math.rad(96.038)), 0.25)
+            LEFTARMLERP.C0 = LEFTARMLERP.C0:lerp(CFrame.new(0.029, -0.543, -0.038) * CFrame.Angles(math.rad(12.983), math.rad(-14.887), math.rad(-110.262)), 0.25)
+            RIGHTLEGLERP.C0 = RIGHTLEGLERP.C0:lerp(CFrame.new(1.056, 0.417, -0.067) * CFrame.Angles(math.rad(-6.851), math.rad(16.188), math.rad(-58.402)), 0.25)
+            LEFTLEGLERP.C0 = LEFTLEGLERP.C0:lerp(CFrame.new(0.392, 0.001, -0.169) * CFrame.Angles(math.rad(-3.435), math.rad(62.693), math.rad(15.089)), 0.25)
+            swait()
+        end
+
+        -- Keyframe 13  (time: 0.4s)
+        for i = 1, 20 do
+            if not dancing then break end
+            ROOTLERP.C0 = ROOTLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(0), math.rad(0), math.rad(0)), 0.25)
+            HEADLERP.C0 = HEADLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(8.481), math.rad(-11.868), math.rad(-30.645)), 0.25)
+            RIGHTARMLERP.C0 = RIGHTARMLERP.C0:lerp(CFrame.new(0.044, -0.804, 0.385) * CFrame.Angles(math.rad(-85.652), math.rad(0.302), math.rad(100.415)), 0.25)
+            LEFTARMLERP.C0 = LEFTARMLERP.C0:lerp(CFrame.new(0.104, -0.572, -0.108) * CFrame.Angles(math.rad(12.934), math.rad(-9.687), math.rad(-108.992)), 0.25)
+            RIGHTLEGLERP.C0 = RIGHTLEGLERP.C0:lerp(CFrame.new(0.965, 0.563, -0.133) * CFrame.Angles(math.rad(-11.319), math.rad(17.496), math.rad(-49.329)), 0.25)
+            LEFTLEGLERP.C0 = LEFTLEGLERP.C0:lerp(CFrame.new(0.367, -0.018, -0.132) * CFrame.Angles(math.rad(1.159), math.rad(60.603), math.rad(11.14)), 0.25)
+            swait()
+        end
+
+        -- Keyframe 14  (time: 0.433s)
+        for i = 1, 20 do
+            if not dancing then break end
+            ROOTLERP.C0 = ROOTLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(0), math.rad(0), math.rad(0)), 0.25)
+            HEADLERP.C0 = HEADLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(7.308), math.rad(-10.539), math.rad(-36.314)), 0.25)
+            RIGHTARMLERP.C0 = RIGHTARMLERP.C0:lerp(CFrame.new(0.031, -0.873, 0.532) * CFrame.Angles(math.rad(-87.851), math.rad(1.057), math.rad(105.315)), 0.25)
+            LEFTARMLERP.C0 = LEFTARMLERP.C0:lerp(CFrame.new(0.252, -0.594, -0.178) * CFrame.Angles(math.rad(9.842), math.rad(0.713), math.rad(-102.988)), 0.25)
+            RIGHTLEGLERP.C0 = RIGHTLEGLERP.C0:lerp(CFrame.new(0.999, 0.5, -0.136) * CFrame.Angles(math.rad(-15.888), math.rad(14.568), math.rad(-45.911)), 0.25)
+            LEFTLEGLERP.C0 = LEFTLEGLERP.C0:lerp(CFrame.new(0.254, 0, 0.015) * CFrame.Angles(math.rad(-0.833), math.rad(55.704), math.rad(15.399)), 0.25)
+            swait()
+        end
+
+        -- Keyframe 15  (time: 0.467s)
+        for i = 1, 20 do
+            if not dancing then break end
+            ROOTLERP.C0 = ROOTLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(0), math.rad(0), math.rad(0)), 0.25)
+            HEADLERP.C0 = HEADLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(5.091), math.rad(-5.899), math.rad(-44.472)), 0.25)
+            RIGHTARMLERP.C0 = RIGHTARMLERP.C0:lerp(CFrame.new(-0.051, -0.946, 0.626) * CFrame.Angles(math.rad(-86.824), math.rad(4.745), math.rad(110.47)), 0.25)
+            LEFTARMLERP.C0 = LEFTARMLERP.C0:lerp(CFrame.new(0.377, -0.611, -0.169) * CFrame.Angles(math.rad(4.296), math.rad(13.631), math.rad(-86.38)), 0.25)
+            RIGHTLEGLERP.C0 = RIGHTLEGLERP.C0:lerp(CFrame.new(1.001, 0.141, 0.065) * CFrame.Angles(math.rad(-20.133), math.rad(7.599), math.rad(-47.678)), 0.25)
+            LEFTLEGLERP.C0 = LEFTLEGLERP.C0:lerp(CFrame.new(0.095, 0.133, 0.138) * CFrame.Angles(math.rad(-12.762), math.rad(48.946), math.rad(22.888)), 0.25)
+            swait()
+        end
+
+        -- Keyframe 16  (time: 0.5s)
+        for i = 1, 20 do
+            if not dancing then break end
+            ROOTLERP.C0 = ROOTLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(0), math.rad(0), math.rad(0)), 0.25)
+            HEADLERP.C0 = HEADLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(-0.193), math.rad(-1.784), math.rad(-54.566)), 0.25)
+            RIGHTARMLERP.C0 = RIGHTARMLERP.C0:lerp(CFrame.new(-0.255, -0.822, 0.45) * CFrame.Angles(math.rad(-80.044), math.rad(21.842), math.rad(97.432)), 0.25)
+            LEFTARMLERP.C0 = LEFTARMLERP.C0:lerp(CFrame.new(0.483, -0.623, -0.157) * CFrame.Angles(math.rad(-7.432), math.rad(25.022), math.rad(-55.578)), 0.25)
+            RIGHTLEGLERP.C0 = RIGHTLEGLERP.C0:lerp(CFrame.new(0.498, -0.035, 0.281) * CFrame.Angles(math.rad(-23.787), math.rad(-1.752), math.rad(-36.592)), 0.25)
+            LEFTLEGLERP.C0 = LEFTLEGLERP.C0:lerp(CFrame.new(0.098, 0.298, -0.018) * CFrame.Angles(math.rad(-33.42), math.rad(39.435), math.rad(17.263)), 0.25)
+            swait()
+        end
+
+        -- Keyframe 17  (time: 0.533s)
+        for i = 1, 20 do
+            if not dancing then break end
+            ROOTLERP.C0 = ROOTLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(0), math.rad(0), math.rad(0)), 0.25)
+            HEADLERP.C0 = HEADLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(-9.198), math.rad(1.879), math.rad(-59.274)), 0.25)
+            RIGHTARMLERP.C0 = RIGHTARMLERP.C0:lerp(CFrame.new(-0.574, -0.535, 0.132) * CFrame.Angles(math.rad(-39.493), math.rad(48.386), math.rad(35.203)), 0.25)
+            LEFTARMLERP.C0 = LEFTARMLERP.C0:lerp(CFrame.new(0.586, -0.613, -0.152) * CFrame.Angles(math.rad(-24.019), math.rad(27.555), math.rad(-14.749)), 0.25)
+            RIGHTLEGLERP.C0 = RIGHTLEGLERP.C0:lerp(CFrame.new(-0.044, 0.062, 0.214) * CFrame.Angles(math.rad(-27.717), math.rad(-9.372), math.rad(-27.446)), 0.25)
+            LEFTLEGLERP.C0 = LEFTLEGLERP.C0:lerp(CFrame.new(0.258, 0.284, -0.179) * CFrame.Angles(math.rad(-41.535), math.rad(31.163), math.rad(2.811)), 0.25)
+            swait()
+        end
+
+        -- Keyframe 18  (time: 0.567s)
+        for i = 1, 20 do
+            if not dancing then break end
+            ROOTLERP.C0 = ROOTLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(0), math.rad(0), math.rad(0)), 0.25)
+            HEADLERP.C0 = HEADLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(-14.892), math.rad(2.98), math.rad(-51.333)), 0.25)
+            RIGHTARMLERP.C0 = RIGHTARMLERP.C0:lerp(CFrame.new(-0.882, -0.172, -0.067) * CFrame.Angles(math.rad(16.649), math.rad(36.641), math.rad(-37.308)), 0.25)
+            LEFTARMLERP.C0 = LEFTARMLERP.C0:lerp(CFrame.new(0.673, -0.572, -0.164) * CFrame.Angles(math.rad(-34.373), math.rad(21.072), math.rad(23.625)), 0.25)
+            RIGHTLEGLERP.C0 = RIGHTLEGLERP.C0:lerp(CFrame.new(-0.061, 0.117, 0.177) * CFrame.Angles(math.rad(-35.444), math.rad(-11.322), math.rad(-36.69)), 0.25)
+            LEFTLEGLERP.C0 = LEFTLEGLERP.C0:lerp(CFrame.new(-0.27, 0.528, -0.043) * CFrame.Angles(math.rad(-42.176), math.rad(26.504), math.rad(19.645)), 0.25)
+            swait()
+        end
+
+        -- Keyframe 19  (time: 0.6s)
+        for i = 1, 20 do
+            if not dancing then break end
+            ROOTLERP.C0 = ROOTLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(0), math.rad(0), math.rad(0)), 0.25)
+            HEADLERP.C0 = HEADLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(-16.212), math.rad(3.874), math.rad(-29.885)), 0.25)
+            RIGHTARMLERP.C0 = RIGHTARMLERP.C0:lerp(CFrame.new(-1.01, 0.087, 0.027) * CFrame.Angles(math.rad(49.205), math.rad(29.942), math.rad(-66.573)), 0.25)
+            LEFTARMLERP.C0 = LEFTARMLERP.C0:lerp(CFrame.new(0.724, -0.514, -0.186) * CFrame.Angles(math.rad(-36.347), math.rad(13.716), math.rad(54.577)), 0.25)
+            RIGHTLEGLERP.C0 = RIGHTLEGLERP.C0:lerp(CFrame.new(-0.053, 0.157, 0.147) * CFrame.Angles(math.rad(-41.29), math.rad(-10.39), math.rad(-42.846)), 0.25)
+            LEFTLEGLERP.C0 = LEFTLEGLERP.C0:lerp(CFrame.new(-0.468, 0.642, -0.068) * CFrame.Angles(math.rad(-45.38), math.rad(24.334), math.rad(28.948)), 0.25)
+            swait()
+        end
+
+        -- Keyframe 20  (time: 0.633s)
+        for i = 1, 20 do
+            if not dancing then break end
+            ROOTLERP.C0 = ROOTLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(0), math.rad(0), math.rad(0)), 0.25)
+            HEADLERP.C0 = HEADLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(-18.678), math.rad(4.047), math.rad(-4.515)), 0.25)
+            RIGHTARMLERP.C0 = RIGHTARMLERP.C0:lerp(CFrame.new(-1.031, 0.172, 0.21) * CFrame.Angles(math.rad(66.345), math.rad(29.823), math.rad(-78.065)), 0.25)
+            LEFTARMLERP.C0 = LEFTARMLERP.C0:lerp(CFrame.new(0.74, -0.478, -0.201) * CFrame.Angles(math.rad(-36.591), math.rad(10.838), math.rad(72.249)), 0.25)
+            RIGHTLEGLERP.C0 = RIGHTLEGLERP.C0:lerp(CFrame.new(-0.06, 0.154, 0.148) * CFrame.Angles(math.rad(-40.916), math.rad(-11.259), math.rad(-44.885)), 0.25)
+            LEFTLEGLERP.C0 = LEFTLEGLERP.C0:lerp(CFrame.new(-0.421, 0.589, -0.05) * CFrame.Angles(math.rad(-46.516), math.rad(24.175), math.rad(29.477)), 0.25)
+            swait()
+        end
+
+        -- Keyframe 21  (time: 0.667s)
+        for i = 1, 20 do
+            if not dancing then break end
+            ROOTLERP.C0 = ROOTLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(0), math.rad(0), math.rad(0)), 0.25)
+            HEADLERP.C0 = HEADLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(-15.34), math.rad(1.56), math.rad(12.628)), 0.25)
+            RIGHTARMLERP.C0 = RIGHTARMLERP.C0:lerp(CFrame.new(-1.024, 0.04, 0.323) * CFrame.Angles(math.rad(68.916), math.rad(34.866), math.rad(-78.361)), 0.25)
+            LEFTARMLERP.C0 = LEFTARMLERP.C0:lerp(CFrame.new(0.673, -0.482, -0.161) * CFrame.Angles(math.rad(-39.343), math.rad(12.68), math.rad(71.208)), 0.25)
+            RIGHTLEGLERP.C0 = RIGHTLEGLERP.C0:lerp(CFrame.new(-0.076, 0.106, 0.174) * CFrame.Angles(math.rad(-33.129), math.rad(-12.966), math.rad(-42.368)), 0.25)
+            LEFTLEGLERP.C0 = LEFTLEGLERP.C0:lerp(CFrame.new(-0.306, 0.491, -0.044) * CFrame.Angles(math.rad(-45.707), math.rad(22.685), math.rad(25.677)), 0.25)
+            swait()
+        end
+
+        -- Keyframe 22  (time: 0.7s)
+        for i = 1, 20 do
+            if not dancing then break end
+            ROOTLERP.C0 = ROOTLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(0), math.rad(0), math.rad(0)), 0.25)
+            HEADLERP.C0 = HEADLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(-5.874), math.rad(2.59), math.rad(22.925)), 0.25)
+            RIGHTARMLERP.C0 = RIGHTARMLERP.C0:lerp(CFrame.new(-0.982, -0.28, 0.375) * CFrame.Angles(math.rad(70.778), math.rad(51.897), math.rad(-73.99)), 0.25)
+            LEFTARMLERP.C0 = LEFTARMLERP.C0:lerp(CFrame.new(0.508, -0.51, -0.055) * CFrame.Angles(math.rad(-41.261), math.rad(18.634), math.rad(50.941)), 0.25)
+            RIGHTLEGLERP.C0 = RIGHTLEGLERP.C0:lerp(CFrame.new(0.286, -0.134, 0.324) * CFrame.Angles(math.rad(-14.879), math.rad(-13.03), math.rad(-43.158)), 0.25)
+            LEFTLEGLERP.C0 = LEFTLEGLERP.C0:lerp(CFrame.new(-0.197, 0.392, -0.057) * CFrame.Angles(math.rad(-42.756), math.rad(18.268), math.rad(20.543)), 0.25)
+            swait()
+        end
+
+        -- Keyframe 23  (time: 0.733s)
+        for i = 1, 20 do
+            if not dancing then break end
+            ROOTLERP.C0 = ROOTLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(0), math.rad(0), math.rad(0)), 0.25)
+            HEADLERP.C0 = HEADLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(3.087), math.rad(5.646), math.rad(28.625)), 0.25)
+            RIGHTARMLERP.C0 = RIGHTARMLERP.C0:lerp(CFrame.new(-0.875, -0.655, 0.391) * CFrame.Angles(math.rad(51.355), math.rad(81.505), math.rad(-46.509)), 0.25)
+            LEFTARMLERP.C0 = LEFTARMLERP.C0:lerp(CFrame.new(0.296, -0.541, 0.06) * CFrame.Angles(math.rad(-31.672), math.rad(24.443), math.rad(4.382)), 0.25)
+            RIGHTLEGLERP.C0 = RIGHTLEGLERP.C0:lerp(CFrame.new(0.502, -0.137, 0.275) * CFrame.Angles(math.rad(2.766), math.rad(-9.479), math.rad(-31.293)), 0.25)
+            LEFTLEGLERP.C0 = LEFTLEGLERP.C0:lerp(CFrame.new(-0.29, 0.338, -0.039) * CFrame.Angles(math.rad(-37.534), math.rad(11.845), math.rad(21.804)), 0.25)
+            swait()
+        end
+
+        -- Keyframe 24  (time: 0.767s)
+        for i = 1, 20 do
+            if not dancing then break end
+            ROOTLERP.C0 = ROOTLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(0), math.rad(0), math.rad(0)), 0.25)
+            HEADLERP.C0 = HEADLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(5.572), math.rad(8.315), math.rad(33.261)), 0.25)
+            RIGHTARMLERP.C0 = RIGHTARMLERP.C0:lerp(CFrame.new(-0.699, -0.938, 0.399) * CFrame.Angles(math.rad(-87.854), math.rad(57.613), math.rad(99.8)), 0.25)
+            LEFTARMLERP.C0 = LEFTARMLERP.C0:lerp(CFrame.new(0.149, -0.531, 0.079) * CFrame.Angles(math.rad(-15.766), math.rad(8.953), math.rad(-48.64)), 0.25)
+            RIGHTLEGLERP.C0 = RIGHTLEGLERP.C0:lerp(CFrame.new(0.473, -0.09, 0.204) * CFrame.Angles(math.rad(8.811), math.rad(-6.975), math.rad(-20.472)), 0.25)
+            LEFTLEGLERP.C0 = LEFTLEGLERP.C0:lerp(CFrame.new(-0.59, 0.28, -0.023) * CFrame.Angles(math.rad(-28.402), math.rad(4.962), math.rad(31.057)), 0.25)
+            swait()
+        end
+
+        -- Keyframe 25  (time: 0.8s)
+        for i = 1, 20 do
+            if not dancing then break end
+            ROOTLERP.C0 = ROOTLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(0), math.rad(0), math.rad(0)), 0.25)
+            HEADLERP.C0 = HEADLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(1.63), math.rad(9.221), math.rad(40.297)), 0.25)
+            RIGHTARMLERP.C0 = RIGHTARMLERP.C0:lerp(CFrame.new(-0.477, -1.017, 0.433) * CFrame.Angles(math.rad(-91.174), math.rad(21.824), math.rad(105.57)), 0.25)
+            LEFTARMLERP.C0 = LEFTARMLERP.C0:lerp(CFrame.new(0.146, -0.693, 0.019) * CFrame.Angles(math.rad(-16.554), math.rad(-16.176), math.rad(-78.505)), 0.25)
+            RIGHTLEGLERP.C0 = RIGHTLEGLERP.C0:lerp(CFrame.new(0.352, -0.049, 0.187) * CFrame.Angles(math.rad(7.418), math.rad(-13.279), math.rad(-16.332)), 0.25)
+            LEFTLEGLERP.C0 = LEFTLEGLERP.C0:lerp(CFrame.new(-1.005, 0.266, -0.036) * CFrame.Angles(math.rad(-11.77), math.rad(0.494), math.rad(51.251)), 0.25)
+            swait()
+        end
+
+        -- Keyframe 26  (time: 0.833s)
+        for i = 1, 20 do
+            if not dancing then break end
+            ROOTLERP.C0 = ROOTLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(0), math.rad(0), math.rad(0)), 0.25)
+            HEADLERP.C0 = HEADLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(-4.191), math.rad(8.749), math.rad(52.645)), 0.25)
+            RIGHTARMLERP.C0 = RIGHTARMLERP.C0:lerp(CFrame.new(-0.17, -0.946, 0.509) * CFrame.Angles(math.rad(-96.678), math.rad(-2.071), math.rad(105.558)), 0.25)
+            LEFTARMLERP.C0 = LEFTARMLERP.C0:lerp(CFrame.new(0.025, -0.888, 0.076) * CFrame.Angles(math.rad(-41.711), math.rad(-3.733), math.rad(-103.806)), 0.25)
+            RIGHTLEGLERP.C0 = RIGHTLEGLERP.C0:lerp(CFrame.new(0.207, -0.002, 0.177) * CFrame.Angles(math.rad(6.161), math.rad(-22.838), math.rad(-12.004)), 0.25)
+            LEFTLEGLERP.C0 = LEFTLEGLERP.C0:lerp(CFrame.new(-0.99, 0.139, -0.027) * CFrame.Angles(math.rad(-6.549), math.rad(-0.818), math.rad(52.266)), 0.25)
+            swait()
+        end
+
+        -- Keyframe 27  (time: 0.867s)
+        for i = 1, 20 do
+            if not dancing then break end
+            ROOTLERP.C0 = ROOTLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(0), math.rad(0), math.rad(0)), 0.25)
+            HEADLERP.C0 = HEADLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(-9.83), math.rad(6.632), math.rad(67.158)), 0.25)
+            RIGHTARMLERP.C0 = RIGHTARMLERP.C0:lerp(CFrame.new(0.145, -0.847, 0.587) * CFrame.Angles(math.rad(-103.554), math.rad(-14.183), math.rad(103.359)), 0.25)
+            LEFTARMLERP.C0 = LEFTARMLERP.C0:lerp(CFrame.new(-0.182, -1.007, 0.191) * CFrame.Angles(math.rad(-61.544), math.rad(25.41), math.rad(-110.964)), 0.25)
+            RIGHTLEGLERP.C0 = RIGHTLEGLERP.C0:lerp(CFrame.new(0.102, 0.032, 0.142) * CFrame.Angles(math.rad(5.682), math.rad(-28.498), math.rad(-7.066)), 0.25)
+            LEFTLEGLERP.C0 = LEFTLEGLERP.C0:lerp(CFrame.new(-0.911, 0.027, 0.037) * CFrame.Angles(math.rad(-4.13), math.rad(2.339), math.rad(53.316)), 0.25)
+            swait()
+        end
+
+        -- Keyframe 28  (time: 0.9s)
+        for i = 1, 20 do
+            if not dancing then break end
+            ROOTLERP.C0 = ROOTLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(0), math.rad(0), math.rad(0)), 0.25)
+            HEADLERP.C0 = HEADLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(-14.109), math.rad(4.451), math.rad(74.262)), 0.25)
+            RIGHTARMLERP.C0 = RIGHTARMLERP.C0:lerp(CFrame.new(0.291, -0.749, 0.623) * CFrame.Angles(math.rad(-106.91), math.rad(-17.725), math.rad(101.983)), 0.25)
+            LEFTARMLERP.C0 = LEFTARMLERP.C0:lerp(CFrame.new(-0.29, -1.05, 0.249) * CFrame.Angles(math.rad(-70.195), math.rad(37.964), math.rad(-109.238)), 0.25)
+            RIGHTLEGLERP.C0 = RIGHTLEGLERP.C0:lerp(CFrame.new(0.022, 0.032, 0.097) * CFrame.Angles(math.rad(5.41), math.rad(-30.198), math.rad(-2.162)), 0.25)
+            LEFTLEGLERP.C0 = LEFTLEGLERP.C0:lerp(CFrame.new(-0.846, 0.002, 0.055) * CFrame.Angles(math.rad(-5.042), math.rad(3.521), math.rad(51.572)), 0.25)
+            swait()
+        end
+
+        -- Keyframe 29  (time: 0.933s)
+        for i = 1, 20 do
+            if not dancing then break end
+            ROOTLERP.C0 = ROOTLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(0), math.rad(0), math.rad(0)), 0.25)
+            HEADLERP.C0 = HEADLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(-18.01), math.rad(4.834), math.rad(69.121)), 0.25)
+            RIGHTARMLERP.C0 = RIGHTARMLERP.C0:lerp(CFrame.new(0.156, -0.678, 0.501) * CFrame.Angles(math.rad(-97.269), math.rad(-6.85), math.rad(91.375)), 0.25)
+            LEFTARMLERP.C0 = LEFTARMLERP.C0:lerp(CFrame.new(-0.284, -0.986, 0.208) * CFrame.Angles(math.rad(-67.911), math.rad(22.473), math.rad(-101.732)), 0.25)
+            RIGHTLEGLERP.C0 = RIGHTLEGLERP.C0:lerp(CFrame.new(-0.036, 0.075, 0.097) * CFrame.Angles(math.rad(-1.537), math.rad(-33.086), math.rad(-0.196)), 0.25)
+            LEFTLEGLERP.C0 = LEFTLEGLERP.C0:lerp(CFrame.new(-0.692, 0.055, 0.034) * CFrame.Angles(math.rad(-8.996), math.rad(3.084), math.rad(38.104)), 0.25)
+            swait()
+        end
+
+        -- Keyframe 30  (time: 0.967s)
+        for i = 1, 20 do
+            if not dancing then break end
+            ROOTLERP.C0 = ROOTLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(0), math.rad(0), math.rad(0)), 0.25)
+            HEADLERP.C0 = HEADLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(-22.446), math.rad(7.622), math.rad(56.829)), 0.25)
+            RIGHTARMLERP.C0 = RIGHTARMLERP.C0:lerp(CFrame.new(-0.181, -0.658, 0.232) * CFrame.Angles(math.rad(-59.405), math.rad(11.771), math.rad(48.966)), 0.25)
+            LEFTARMLERP.C0 = LEFTARMLERP.C0:lerp(CFrame.new(-0.197, -0.86, 0.114) * CFrame.Angles(math.rad(-52.66), math.rad(-16.765), math.rad(-69.439)), 0.25)
+            RIGHTLEGLERP.C0 = RIGHTLEGLERP.C0:lerp(CFrame.new(-0.16, 0.123, 0.066) * CFrame.Angles(math.rad(-18.322), math.rad(-38.544), math.rad(-1.569)), 0.25)
+            LEFTLEGLERP.C0 = LEFTLEGLERP.C0:lerp(CFrame.new(0.02, 0.032, -0.001) * CFrame.Angles(math.rad(-12.444), math.rad(4.893), math.rad(4.607)), 0.25)
+            swait()
+        end
+
+        -- Keyframe 31  (time: 1s)
+        for i = 1, 20 do
+            if not dancing then break end
+            ROOTLERP.C0 = ROOTLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(0), math.rad(0), math.rad(0)), 0.25)
+            HEADLERP.C0 = HEADLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(-28.915), math.rad(11.234), math.rad(42.588)), 0.25)
+            RIGHTARMLERP.C0 = RIGHTARMLERP.C0:lerp(CFrame.new(-0.57, -0.611, -0.107) * CFrame.Angles(math.rad(-18.555), math.rad(-1.73), math.rad(-2.32)), 0.25)
+            LEFTARMLERP.C0 = LEFTARMLERP.C0:lerp(CFrame.new(0.055, -0.659, 0.004) * CFrame.Angles(math.rad(-15.348), math.rad(-17.749), math.rad(-6.663)), 0.25)
+            RIGHTLEGLERP.C0 = RIGHTLEGLERP.C0:lerp(CFrame.new(-0.021, 0.307, 0.141) * CFrame.Angles(math.rad(-39.816), math.rad(-40.695), math.rad(-16.664)), 0.25)
+            LEFTLEGLERP.C0 = LEFTLEGLERP.C0:lerp(CFrame.new(0.033, -0.002, 0.011) * CFrame.Angles(math.rad(-18.326), math.rad(8.176), math.rad(-3.723)), 0.25)
+            swait()
+        end
+
+        -- Keyframe 32  (time: 1.033s)
+        for i = 1, 20 do
+            if not dancing then break end
+            ROOTLERP.C0 = ROOTLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(0), math.rad(0), math.rad(0)), 0.25)
+            HEADLERP.C0 = HEADLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(-38.534), math.rad(9.038), math.rad(34.094)), 0.25)
+            RIGHTARMLERP.C0 = RIGHTARMLERP.C0:lerp(CFrame.new(-0.754, -0.476, -0.279) * CFrame.Angles(math.rad(-10.128), math.rad(-11.949), math.rad(-28.639)), 0.25)
+            LEFTARMLERP.C0 = LEFTARMLERP.C0:lerp(CFrame.new(0.4, -0.432, -0.089) * CFrame.Angles(math.rad(-7.451), math.rad(-2.701), math.rad(27.463)), 0.25)
+            RIGHTLEGLERP.C0 = RIGHTLEGLERP.C0:lerp(CFrame.new(0.235, 0.457, 0.114) * CFrame.Angles(math.rad(-46.557), math.rad(-29.784), math.rad(-14.008)), 0.25)
+            LEFTLEGLERP.C0 = LEFTLEGLERP.C0:lerp(CFrame.new(0.027, -0.009, 0.039) * CFrame.Angles(math.rad(-29.962), math.rad(20.448), math.rad(7.028)), 0.25)
+            swait()
+        end
+
+        -- Keyframe 33  (time: 1.067s)
+        for i = 1, 20 do
+            if not dancing then break end
+            ROOTLERP.C0 = ROOTLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(0), math.rad(0), math.rad(0)), 0.25)
+            HEADLERP.C0 = HEADLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(-41.63), math.rad(12.329), math.rad(9.709)), 0.25)
+            RIGHTARMLERP.C0 = RIGHTARMLERP.C0:lerp(CFrame.new(-0.757, -0.304, -0.279) * CFrame.Angles(math.rad(-12.311), math.rad(-9.166), math.rad(-43.842)), 0.25)
+            LEFTARMLERP.C0 = LEFTARMLERP.C0:lerp(CFrame.new(0.795, -0.294, -0.116) * CFrame.Angles(math.rad(-4.486), math.rad(-7.308), math.rad(43.92)), 0.25)
+            RIGHTLEGLERP.C0 = RIGHTLEGLERP.C0:lerp(CFrame.new(0.31, 0.368, 0.187) * CFrame.Angles(math.rad(-43.354), math.rad(-23.636), math.rad(-17.698)), 0.25)
+            LEFTLEGLERP.C0 = LEFTLEGLERP.C0:lerp(CFrame.new(-0.306, 0.033, 0.363) * CFrame.Angles(math.rad(-31.871), math.rad(20.707), math.rad(18.719)), 0.25)
+            swait()
+        end
+
+        -- Keyframe 34  (time: 1.1s)
+        for i = 1, 20 do
+            if not dancing then break end
+            ROOTLERP.C0 = ROOTLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(0), math.rad(0), math.rad(0)), 0.25)
+            HEADLERP.C0 = HEADLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(-33.556), math.rad(14.757), math.rad(-12.604)), 0.25)
+            RIGHTARMLERP.C0 = RIGHTARMLERP.C0:lerp(CFrame.new(-0.745, -0.215, -0.265) * CFrame.Angles(math.rad(-12.631), math.rad(-4.408), math.rad(-50.208)), 0.25)
+            LEFTARMLERP.C0 = LEFTARMLERP.C0:lerp(CFrame.new(0.995, -0.254, -0.117) * CFrame.Angles(math.rad(-2.284), math.rad(-11.366), math.rad(49.078)), 0.25)
+            RIGHTLEGLERP.C0 = RIGHTLEGLERP.C0:lerp(CFrame.new(0.272, 0.168, 0.257) * CFrame.Angles(math.rad(-34.443), math.rad(-15.616), math.rad(-20.308)), 0.25)
+            LEFTLEGLERP.C0 = LEFTLEGLERP.C0:lerp(CFrame.new(-0.329, 0.056, 0.363) * CFrame.Angles(math.rad(-29.349), math.rad(21.24), math.rad(19.47)), 0.25)
+            swait()
+        end
+
+        -- Keyframe 35  (time: 1.133s)
+        for i = 1, 20 do
+            if not dancing then break end
+            ROOTLERP.C0 = ROOTLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(0), math.rad(0), math.rad(0)), 0.25)
+            HEADLERP.C0 = HEADLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(-20.593), math.rad(12.825), math.rad(-28.017)), 0.25)
+            RIGHTARMLERP.C0 = RIGHTARMLERP.C0:lerp(CFrame.new(-0.74, -0.237, -0.188) * CFrame.Angles(math.rad(-8.304), math.rad(3.603), math.rad(-46.435)), 0.25)
+            LEFTARMLERP.C0 = LEFTARMLERP.C0:lerp(CFrame.new(0.919, -0.341, -0.114) * CFrame.Angles(math.rad(-5.662), math.rad(-10.683), math.rad(29.082)), 0.25)
+            RIGHTLEGLERP.C0 = RIGHTLEGLERP.C0:lerp(CFrame.new(0.145, 0.007, 0.271) * CFrame.Angles(math.rad(-23.852), math.rad(-8.499), math.rad(-22.527)), 0.25)
+            LEFTLEGLERP.C0 = LEFTLEGLERP.C0:lerp(CFrame.new(-0.348, 0.057, 0.39) * CFrame.Angles(math.rad(-20.591), math.rad(23.219), math.rad(22.435)), 0.25)
+            swait()
+        end
+
+        -- Keyframe 36  (time: 1.167s)
+        for i = 1, 20 do
+            if not dancing then break end
+            ROOTLERP.C0 = ROOTLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(0), math.rad(0), math.rad(0)), 0.25)
+            HEADLERP.C0 = HEADLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(-7.304), math.rad(8.619), math.rad(-35.103)), 0.25)
+            RIGHTARMLERP.C0 = RIGHTARMLERP.C0:lerp(CFrame.new(-0.709, -0.387, -0.022) * CFrame.Angles(math.rad(-4.735), math.rad(19.215), math.rad(-25.866)), 0.25)
+            LEFTARMLERP.C0 = LEFTARMLERP.C0:lerp(CFrame.new(0.694, -0.478, -0.099) * CFrame.Angles(math.rad(-10.003), math.rad(-5.825), math.rad(-13.139)), 0.25)
+            RIGHTLEGLERP.C0 = RIGHTLEGLERP.C0:lerp(CFrame.new(0.528, -0.152, 0.316) * CFrame.Angles(math.rad(-15.138), math.rad(-2.709), math.rad(-43.341)), 0.25)
+            LEFTLEGLERP.C0 = LEFTLEGLERP.C0:lerp(CFrame.new(-0.362, -0.005, 0.423) * CFrame.Angles(math.rad(-11.211), math.rad(26.162), math.rad(28.152)), 0.25)
+            swait()
+        end
+
+        -- Keyframe 37  (time: 1.2s)
+        for i = 1, 20 do
+            if not dancing then break end
+            ROOTLERP.C0 = ROOTLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(0), math.rad(0), math.rad(0)), 0.25)
+            HEADLERP.C0 = HEADLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(3.513), math.rad(5.12), math.rad(-35.469)), 0.25)
+            RIGHTARMLERP.C0 = RIGHTARMLERP.C0:lerp(CFrame.new(-0.374, -0.83, 0.187) * CFrame.Angles(math.rad(-37.545), math.rad(36.079), math.rad(34.85)), 0.25)
+            LEFTARMLERP.C0 = LEFTARMLERP.C0:lerp(CFrame.new(0.385, -0.536, -0.078) * CFrame.Angles(math.rad(-3.564), math.rad(-2.829), math.rad(-55.777)), 0.25)
+            RIGHTLEGLERP.C0 = RIGHTLEGLERP.C0:lerp(CFrame.new(0.891, -0.284, 0.264) * CFrame.Angles(math.rad(-8.179), math.rad(2.358), math.rad(-65.235)), 0.25)
+            LEFTLEGLERP.C0 = LEFTLEGLERP.C0:lerp(CFrame.new(-0.176, -0.051, 0.433) * CFrame.Angles(math.rad(-8.336), math.rad(39.42), math.rad(33.173)), 0.25)
+            swait()
+        end
+
+        -- Keyframe 38  (time: 1.233s)
+        for i = 1, 20 do
+            if not dancing then break end
+            ROOTLERP.C0 = ROOTLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(0), math.rad(0), math.rad(0)), 0.25)
+            HEADLERP.C0 = HEADLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(9.232), math.rad(-0.702), math.rad(-31.418)), 0.25)
+            RIGHTARMLERP.C0 = RIGHTARMLERP.C0:lerp(CFrame.new(-0.027, -1.108, 0.322) * CFrame.Angles(math.rad(-72.409), math.rad(16.31), math.rad(83.803)), 0.25)
+            LEFTARMLERP.C0 = LEFTARMLERP.C0:lerp(CFrame.new(0.129, -0.534, -0.055) * CFrame.Angles(math.rad(7.65), math.rad(-9.613), math.rad(-93.783)), 0.25)
+            RIGHTLEGLERP.C0 = RIGHTLEGLERP.C0:lerp(CFrame.new(1.122, -0.203, 0.136) * CFrame.Angles(math.rad(-2.819), math.rad(7.758), math.rad(-76.244)), 0.25)
+            LEFTLEGLERP.C0 = LEFTLEGLERP.C0:lerp(CFrame.new(0.135, 0.005, 0.253) * CFrame.Angles(math.rad(-12.079), math.rad(55.669), math.rad(34.07)), 0.25)
+            swait()
+        end
+
+        -- Keyframe 39  (time: 1.267s)
+        for i = 1, 20 do
+            if not dancing then break end
+            ROOTLERP.C0 = ROOTLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(0), math.rad(0), math.rad(0)), 0.25)
+            HEADLERP.C0 = HEADLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(9.557), math.rad(-7.546), math.rad(-27.411)), 0.25)
+            RIGHTARMLERP.C0 = RIGHTARMLERP.C0:lerp(CFrame.new(0.037, -0.946, 0.348) * CFrame.Angles(math.rad(-81.609), math.rad(3.691), math.rad(96.038)), 0.25)
+            LEFTARMLERP.C0 = LEFTARMLERP.C0:lerp(CFrame.new(0.029, -0.543, -0.038) * CFrame.Angles(math.rad(12.983), math.rad(-14.887), math.rad(-110.262)), 0.25)
+            RIGHTLEGLERP.C0 = RIGHTLEGLERP.C0:lerp(CFrame.new(1.056, 0.417, -0.067) * CFrame.Angles(math.rad(-6.851), math.rad(16.188), math.rad(-58.402)), 0.25)
+            LEFTLEGLERP.C0 = LEFTLEGLERP.C0:lerp(CFrame.new(0.392, 0.001, -0.169) * CFrame.Angles(math.rad(-3.435), math.rad(62.693), math.rad(15.089)), 0.25)
+            swait()
+        end
+
+        -- Keyframe 40  (time: 1.3s)
+        for i = 1, 20 do
+            if not dancing then break end
+            ROOTLERP.C0 = ROOTLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(0), math.rad(0), math.rad(0)), 0.25)
+            HEADLERP.C0 = HEADLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(9.313), math.rad(-13.539), math.rad(-30.547)), 0.25)
+            RIGHTARMLERP.C0 = RIGHTARMLERP.C0:lerp(CFrame.new(0.044, -0.804, 0.385) * CFrame.Angles(math.rad(-85.652), math.rad(0.302), math.rad(100.415)), 0.25)
+            LEFTARMLERP.C0 = LEFTARMLERP.C0:lerp(CFrame.new(0.104, -0.572, -0.108) * CFrame.Angles(math.rad(12.934), math.rad(-9.687), math.rad(-108.992)), 0.25)
+            RIGHTLEGLERP.C0 = RIGHTLEGLERP.C0:lerp(CFrame.new(0.965, 0.563, -0.133) * CFrame.Angles(math.rad(-11.319), math.rad(17.496), math.rad(-49.329)), 0.25)
+            LEFTLEGLERP.C0 = LEFTLEGLERP.C0:lerp(CFrame.new(0.367, -0.018, -0.132) * CFrame.Angles(math.rad(1.159), math.rad(60.603), math.rad(11.14)), 0.25)
+            swait()
+        end
+
+        -- Keyframe 41  (time: 1.333s)
+        for i = 1, 20 do
+            if not dancing then break end
+            ROOTLERP.C0 = ROOTLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(0), math.rad(0), math.rad(0)), 0.25)
+            HEADLERP.C0 = HEADLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(7.846), math.rad(-11.837), math.rad(-36.277)), 0.25)
+            RIGHTARMLERP.C0 = RIGHTARMLERP.C0:lerp(CFrame.new(0.031, -0.873, 0.532) * CFrame.Angles(math.rad(-87.851), math.rad(1.057), math.rad(105.315)), 0.25)
+            LEFTARMLERP.C0 = LEFTARMLERP.C0:lerp(CFrame.new(0.252, -0.594, -0.178) * CFrame.Angles(math.rad(9.842), math.rad(0.713), math.rad(-102.988)), 0.25)
+            RIGHTLEGLERP.C0 = RIGHTLEGLERP.C0:lerp(CFrame.new(0.999, 0.5, -0.136) * CFrame.Angles(math.rad(-15.888), math.rad(14.568), math.rad(-45.911)), 0.25)
+            LEFTLEGLERP.C0 = LEFTLEGLERP.C0:lerp(CFrame.new(0.254, 0, 0.015) * CFrame.Angles(math.rad(-0.833), math.rad(55.704), math.rad(15.399)), 0.25)
+            swait()
+        end
+
+        -- Keyframe 42  (time: 1.367s)
+        for i = 1, 20 do
+            if not dancing then break end
+            ROOTLERP.C0 = ROOTLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(0), math.rad(0), math.rad(0)), 0.25)
+            HEADLERP.C0 = HEADLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(5.276), math.rad(-6.392), math.rad(-44.474)), 0.25)
+            RIGHTARMLERP.C0 = RIGHTARMLERP.C0:lerp(CFrame.new(-0.051, -0.946, 0.626) * CFrame.Angles(math.rad(-86.824), math.rad(4.745), math.rad(110.47)), 0.25)
+            LEFTARMLERP.C0 = LEFTARMLERP.C0:lerp(CFrame.new(0.377, -0.611, -0.169) * CFrame.Angles(math.rad(4.296), math.rad(13.631), math.rad(-86.38)), 0.25)
+            RIGHTLEGLERP.C0 = RIGHTLEGLERP.C0:lerp(CFrame.new(1.001, 0.141, 0.065) * CFrame.Angles(math.rad(-20.133), math.rad(7.599), math.rad(-47.678)), 0.25)
+            LEFTLEGLERP.C0 = LEFTLEGLERP.C0:lerp(CFrame.new(0.095, 0.133, 0.138) * CFrame.Angles(math.rad(-12.762), math.rad(48.946), math.rad(22.888)), 0.25)
+            swait()
+        end
+
+        -- Keyframe 43  (time: 1.4s)
+        for i = 1, 20 do
+            if not dancing then break end
+            ROOTLERP.C0 = ROOTLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(0), math.rad(0), math.rad(0)), 0.25)
+            HEADLERP.C0 = HEADLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(-0.193), math.rad(-1.784), math.rad(-54.566)), 0.25)
+            RIGHTARMLERP.C0 = RIGHTARMLERP.C0:lerp(CFrame.new(-0.255, -0.822, 0.45) * CFrame.Angles(math.rad(-80.044), math.rad(21.842), math.rad(97.432)), 0.25)
+            LEFTARMLERP.C0 = LEFTARMLERP.C0:lerp(CFrame.new(0.483, -0.623, -0.157) * CFrame.Angles(math.rad(-7.432), math.rad(25.022), math.rad(-55.578)), 0.25)
+            RIGHTLEGLERP.C0 = RIGHTLEGLERP.C0:lerp(CFrame.new(0.498, -0.035, 0.281) * CFrame.Angles(math.rad(-23.787), math.rad(-1.752), math.rad(-36.592)), 0.25)
+            LEFTLEGLERP.C0 = LEFTLEGLERP.C0:lerp(CFrame.new(0.098, 0.298, -0.018) * CFrame.Angles(math.rad(-33.42), math.rad(39.435), math.rad(17.263)), 0.25)
+            swait()
+        end
+
+        -- Keyframe 44  (time: 1.433s)
+        for i = 1, 20 do
+            if not dancing then break end
+            ROOTLERP.C0 = ROOTLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(0), math.rad(0), math.rad(0)), 0.25)
+            HEADLERP.C0 = HEADLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(-9.234), math.rad(1.902), math.rad(-59.275)), 0.25)
+            RIGHTARMLERP.C0 = RIGHTARMLERP.C0:lerp(CFrame.new(-0.574, -0.535, 0.132) * CFrame.Angles(math.rad(-39.493), math.rad(48.386), math.rad(35.203)), 0.25)
+            LEFTARMLERP.C0 = LEFTARMLERP.C0:lerp(CFrame.new(0.586, -0.613, -0.152) * CFrame.Angles(math.rad(-24.019), math.rad(27.555), math.rad(-14.749)), 0.25)
+            RIGHTLEGLERP.C0 = RIGHTLEGLERP.C0:lerp(CFrame.new(-0.044, 0.062, 0.214) * CFrame.Angles(math.rad(-27.717), math.rad(-9.372), math.rad(-27.446)), 0.25)
+            LEFTLEGLERP.C0 = LEFTLEGLERP.C0:lerp(CFrame.new(0.258, 0.284, -0.179) * CFrame.Angles(math.rad(-41.535), math.rad(31.163), math.rad(2.811)), 0.25)
+            swait()
+        end
+
+        -- Keyframe 45  (time: 1.467s)
+        for i = 1, 20 do
+            if not dancing then break end
+            ROOTLERP.C0 = ROOTLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(0), math.rad(0), math.rad(0)), 0.25)
+            HEADLERP.C0 = HEADLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(-14.892), math.rad(2.98), math.rad(-51.333)), 0.25)
+            RIGHTARMLERP.C0 = RIGHTARMLERP.C0:lerp(CFrame.new(-0.882, -0.172, -0.067) * CFrame.Angles(math.rad(16.649), math.rad(36.641), math.rad(-37.308)), 0.25)
+            LEFTARMLERP.C0 = LEFTARMLERP.C0:lerp(CFrame.new(0.673, -0.572, -0.164) * CFrame.Angles(math.rad(-34.373), math.rad(21.072), math.rad(23.625)), 0.25)
+            RIGHTLEGLERP.C0 = RIGHTLEGLERP.C0:lerp(CFrame.new(-0.061, 0.117, 0.177) * CFrame.Angles(math.rad(-35.444), math.rad(-11.322), math.rad(-36.69)), 0.25)
+            LEFTLEGLERP.C0 = LEFTLEGLERP.C0:lerp(CFrame.new(-0.27, 0.528, -0.043) * CFrame.Angles(math.rad(-42.176), math.rad(26.504), math.rad(19.645)), 0.25)
+            swait()
+        end
+
+        -- Keyframe 46  (time: 1.5s)
+        for i = 1, 20 do
+            if not dancing then break end
+            ROOTLERP.C0 = ROOTLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(0), math.rad(0), math.rad(0)), 0.25)
+            HEADLERP.C0 = HEADLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(-16.212), math.rad(3.874), math.rad(-29.885)), 0.25)
+            RIGHTARMLERP.C0 = RIGHTARMLERP.C0:lerp(CFrame.new(-1.01, 0.087, 0.027) * CFrame.Angles(math.rad(49.205), math.rad(29.942), math.rad(-66.573)), 0.25)
+            LEFTARMLERP.C0 = LEFTARMLERP.C0:lerp(CFrame.new(0.724, -0.514, -0.186) * CFrame.Angles(math.rad(-36.347), math.rad(13.716), math.rad(54.577)), 0.25)
+            RIGHTLEGLERP.C0 = RIGHTLEGLERP.C0:lerp(CFrame.new(-0.053, 0.157, 0.147) * CFrame.Angles(math.rad(-41.29), math.rad(-10.39), math.rad(-42.846)), 0.25)
+            LEFTLEGLERP.C0 = LEFTLEGLERP.C0:lerp(CFrame.new(-0.468, 0.642, -0.068) * CFrame.Angles(math.rad(-45.38), math.rad(24.334), math.rad(28.948)), 0.25)
+            swait()
+        end
+
+        -- Keyframe 47  (time: 1.533s)
+        for i = 1, 20 do
+            if not dancing then break end
+            ROOTLERP.C0 = ROOTLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(0), math.rad(0), math.rad(0)), 0.25)
+            HEADLERP.C0 = HEADLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(-18.678), math.rad(4.047), math.rad(-4.515)), 0.25)
+            RIGHTARMLERP.C0 = RIGHTARMLERP.C0:lerp(CFrame.new(-1.031, 0.172, 0.21) * CFrame.Angles(math.rad(66.345), math.rad(29.823), math.rad(-78.065)), 0.25)
+            LEFTARMLERP.C0 = LEFTARMLERP.C0:lerp(CFrame.new(0.74, -0.478, -0.201) * CFrame.Angles(math.rad(-36.591), math.rad(10.838), math.rad(72.249)), 0.25)
+            RIGHTLEGLERP.C0 = RIGHTLEGLERP.C0:lerp(CFrame.new(-0.06, 0.154, 0.148) * CFrame.Angles(math.rad(-40.916), math.rad(-11.259), math.rad(-44.885)), 0.25)
+            LEFTLEGLERP.C0 = LEFTLEGLERP.C0:lerp(CFrame.new(-0.421, 0.589, -0.05) * CFrame.Angles(math.rad(-46.516), math.rad(24.175), math.rad(29.477)), 0.25)
+            swait()
+        end
+
+        -- Keyframe 48  (time: 1.567s)
+        for i = 1, 20 do
+            if not dancing then break end
+            ROOTLERP.C0 = ROOTLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(0), math.rad(0), math.rad(0)), 0.25)
+            HEADLERP.C0 = HEADLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(-15.34), math.rad(1.56), math.rad(12.628)), 0.25)
+            RIGHTARMLERP.C0 = RIGHTARMLERP.C0:lerp(CFrame.new(-1.024, 0.04, 0.323) * CFrame.Angles(math.rad(68.916), math.rad(34.866), math.rad(-78.361)), 0.25)
+            LEFTARMLERP.C0 = LEFTARMLERP.C0:lerp(CFrame.new(0.673, -0.482, -0.161) * CFrame.Angles(math.rad(-39.343), math.rad(12.68), math.rad(71.208)), 0.25)
+            RIGHTLEGLERP.C0 = RIGHTLEGLERP.C0:lerp(CFrame.new(-0.076, 0.106, 0.174) * CFrame.Angles(math.rad(-33.129), math.rad(-12.966), math.rad(-42.368)), 0.25)
+            LEFTLEGLERP.C0 = LEFTLEGLERP.C0:lerp(CFrame.new(-0.306, 0.491, -0.044) * CFrame.Angles(math.rad(-45.707), math.rad(22.685), math.rad(25.677)), 0.25)
+            swait()
+        end
+
+        -- Keyframe 49  (time: 1.6s)
+        for i = 1, 20 do
+            if not dancing then break end
+            ROOTLERP.C0 = ROOTLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(0), math.rad(0), math.rad(0)), 0.25)
+            HEADLERP.C0 = HEADLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(-5.874), math.rad(2.59), math.rad(22.925)), 0.25)
+            RIGHTARMLERP.C0 = RIGHTARMLERP.C0:lerp(CFrame.new(-0.982, -0.28, 0.375) * CFrame.Angles(math.rad(70.778), math.rad(51.897), math.rad(-73.99)), 0.25)
+            LEFTARMLERP.C0 = LEFTARMLERP.C0:lerp(CFrame.new(0.508, -0.51, -0.055) * CFrame.Angles(math.rad(-41.261), math.rad(18.634), math.rad(50.941)), 0.25)
+            RIGHTLEGLERP.C0 = RIGHTLEGLERP.C0:lerp(CFrame.new(0.286, -0.134, 0.324) * CFrame.Angles(math.rad(-14.879), math.rad(-13.03), math.rad(-43.158)), 0.25)
+            LEFTLEGLERP.C0 = LEFTLEGLERP.C0:lerp(CFrame.new(-0.197, 0.392, -0.057) * CFrame.Angles(math.rad(-42.756), math.rad(18.268), math.rad(20.543)), 0.25)
+            swait()
+        end
+
+        -- Keyframe 50  (time: 1.633s)
+        for i = 1, 20 do
+            if not dancing then break end
+            ROOTLERP.C0 = ROOTLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(0), math.rad(0), math.rad(0)), 0.25)
+            HEADLERP.C0 = HEADLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(3.087), math.rad(5.646), math.rad(28.625)), 0.25)
+            RIGHTARMLERP.C0 = RIGHTARMLERP.C0:lerp(CFrame.new(-0.875, -0.655, 0.391) * CFrame.Angles(math.rad(51.355), math.rad(81.505), math.rad(-46.509)), 0.25)
+            LEFTARMLERP.C0 = LEFTARMLERP.C0:lerp(CFrame.new(0.296, -0.541, 0.06) * CFrame.Angles(math.rad(-31.672), math.rad(24.443), math.rad(4.382)), 0.25)
+            RIGHTLEGLERP.C0 = RIGHTLEGLERP.C0:lerp(CFrame.new(0.502, -0.137, 0.275) * CFrame.Angles(math.rad(2.766), math.rad(-9.479), math.rad(-31.293)), 0.25)
+            LEFTLEGLERP.C0 = LEFTLEGLERP.C0:lerp(CFrame.new(-0.29, 0.338, -0.039) * CFrame.Angles(math.rad(-37.534), math.rad(11.845), math.rad(21.804)), 0.25)
+            swait()
+        end
+
+        -- Keyframe 51  (time: 1.667s)
+        for i = 1, 20 do
+            if not dancing then break end
+            ROOTLERP.C0 = ROOTLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(0), math.rad(0), math.rad(0)), 0.25)
+            HEADLERP.C0 = HEADLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(5.572), math.rad(8.315), math.rad(33.261)), 0.25)
+            RIGHTARMLERP.C0 = RIGHTARMLERP.C0:lerp(CFrame.new(-0.699, -0.938, 0.399) * CFrame.Angles(math.rad(-87.854), math.rad(57.613), math.rad(99.8)), 0.25)
+            LEFTARMLERP.C0 = LEFTARMLERP.C0:lerp(CFrame.new(0.149, -0.531, 0.079) * CFrame.Angles(math.rad(-15.766), math.rad(8.953), math.rad(-48.64)), 0.25)
+            RIGHTLEGLERP.C0 = RIGHTLEGLERP.C0:lerp(CFrame.new(0.473, -0.09, 0.204) * CFrame.Angles(math.rad(8.811), math.rad(-6.975), math.rad(-20.472)), 0.25)
+            LEFTLEGLERP.C0 = LEFTLEGLERP.C0:lerp(CFrame.new(-0.59, 0.28, -0.023) * CFrame.Angles(math.rad(-28.402), math.rad(4.962), math.rad(31.057)), 0.25)
+            swait()
+        end
+
+        -- Keyframe 52  (time: 1.7s)
+        for i = 1, 20 do
+            if not dancing then break end
+            ROOTLERP.C0 = ROOTLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(0), math.rad(0), math.rad(0)), 0.25)
+            HEADLERP.C0 = HEADLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(1.63), math.rad(9.221), math.rad(40.297)), 0.25)
+            RIGHTARMLERP.C0 = RIGHTARMLERP.C0:lerp(CFrame.new(-0.477, -1.017, 0.433) * CFrame.Angles(math.rad(-91.174), math.rad(21.824), math.rad(105.57)), 0.25)
+            LEFTARMLERP.C0 = LEFTARMLERP.C0:lerp(CFrame.new(0.146, -0.693, 0.019) * CFrame.Angles(math.rad(-16.554), math.rad(-16.176), math.rad(-78.505)), 0.25)
+            RIGHTLEGLERP.C0 = RIGHTLEGLERP.C0:lerp(CFrame.new(0.352, -0.049, 0.187) * CFrame.Angles(math.rad(7.418), math.rad(-13.279), math.rad(-16.332)), 0.25)
+            LEFTLEGLERP.C0 = LEFTLEGLERP.C0:lerp(CFrame.new(-1.005, 0.266, -0.036) * CFrame.Angles(math.rad(-11.77), math.rad(0.494), math.rad(51.251)), 0.25)
+            swait()
+        end
+
+        -- Keyframe 53  (time: 1.733s)
+        for i = 1, 20 do
+            if not dancing then break end
+            ROOTLERP.C0 = ROOTLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(0), math.rad(0), math.rad(0)), 0.25)
+            HEADLERP.C0 = HEADLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(-4.191), math.rad(8.749), math.rad(52.645)), 0.25)
+            RIGHTARMLERP.C0 = RIGHTARMLERP.C0:lerp(CFrame.new(-0.17, -0.943, 0.509) * CFrame.Angles(math.rad(-96.678), math.rad(-2.071), math.rad(105.558)), 0.25)
+            LEFTARMLERP.C0 = LEFTARMLERP.C0:lerp(CFrame.new(0.025, -0.888, 0.076) * CFrame.Angles(math.rad(-41.711), math.rad(-3.733), math.rad(-103.806)), 0.25)
+            RIGHTLEGLERP.C0 = RIGHTLEGLERP.C0:lerp(CFrame.new(0.207, -0.002, 0.177) * CFrame.Angles(math.rad(6.161), math.rad(-22.838), math.rad(-12.004)), 0.25)
+            LEFTLEGLERP.C0 = LEFTLEGLERP.C0:lerp(CFrame.new(-0.99, 0.139, -0.027) * CFrame.Angles(math.rad(-6.549), math.rad(-0.818), math.rad(52.266)), 0.25)
+            swait()
+        end
+
+        -- Keyframe 54  (time: 1.767s)
+        for i = 1, 20 do
+            if not dancing then break end
+            ROOTLERP.C0 = ROOTLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(0), math.rad(0), math.rad(0)), 0.25)
+            HEADLERP.C0 = HEADLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(-9.83), math.rad(6.632), math.rad(67.158)), 0.25)
+            RIGHTARMLERP.C0 = RIGHTARMLERP.C0:lerp(CFrame.new(0.145, -0.842, 0.587) * CFrame.Angles(math.rad(-103.554), math.rad(-14.183), math.rad(103.359)), 0.25)
+            LEFTARMLERP.C0 = LEFTARMLERP.C0:lerp(CFrame.new(-0.182, -1.007, 0.191) * CFrame.Angles(math.rad(-61.544), math.rad(25.41), math.rad(-110.964)), 0.25)
+            RIGHTLEGLERP.C0 = RIGHTLEGLERP.C0:lerp(CFrame.new(0.102, 0.032, 0.142) * CFrame.Angles(math.rad(5.682), math.rad(-28.498), math.rad(-7.066)), 0.25)
+            LEFTLEGLERP.C0 = LEFTLEGLERP.C0:lerp(CFrame.new(-0.911, 0.027, 0.037) * CFrame.Angles(math.rad(-4.13), math.rad(2.339), math.rad(53.316)), 0.25)
+            swait() 
+	end
+
+        -- Keyframe 55  (time: 1.8s)
+        for i = 1, 20 do
+            if not dancing then break end
+            ROOTLERP.C0 = ROOTLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(0), math.rad(0), math.rad(0)), 0.25)
+            HEADLERP.C0 = HEADLERP.C0:lerp(CFrame.new(0, 0, 0) * CFrame.Angles(math.rad(-14.109), math.rad(4.451), math.rad(74.262)), 0.25)
+            RIGHTARMLERP.C0 = RIGHTARMLERP.C0:lerp(CFrame.new(0.291, -0.749, 0.623) * CFrame.Angles(math.rad(-106.91), math.rad(-17.725), math.rad(101.983)), 0.25)
+            LEFTARMLERP.C0 = LEFTARMLERP.C0:lerp(CFrame.new(-0.29, -1.05, 0.249) * CFrame.Angles(math.rad(-70.195), math.rad(37.964), math.rad(-109.238)), 0.25)
+            RIGHTLEGLERP.C0 = RIGHTLEGLERP.C0:lerp(CFrame.new(0.022, 0.032, 0.097) * CFrame.Angles(math.rad(5.41), math.rad(-30.198), math.rad(-2.162)), 0.25)
+            LEFTLEGLERP.C0 = LEFTLEGLERP.C0:lerp(CFrame.new(-0.846, 0.002, 0.055) * CFrame.Angles(math.rad(-5.042), math.rad(3.521), math.rad(51.572)), 0.25)
+            swait()
+	end
+    end
+end}
+
+-- ==================== GUI ====================
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "KrystalDanceGUI"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+ScreenGui.Parent = Player.PlayerGui
+
+local Main = Instance.new("Frame", ScreenGui)
+Main.Name = "Main"
+Main.Size = UDim2.new(0, 260, 0, 410)
+Main.Position = UDim2.new(0, 20, 0.5, -205)
+Main.BackgroundColor3 = Color3.fromRGB(10, 5, 20)
+Main.BorderSizePixel = 0
+Main.Active = true
+Main.Draggable = true
+Instance.new("UICorner", Main).CornerRadius = UDim.new(0, 8)
+
+local MainStroke = Instance.new("UIStroke", Main)
+MainStroke.Color = Color3.fromRGB(120, 0, 255)
+MainStroke.Thickness = 1.5
+
+local TitleBar = Instance.new("Frame", Main)
+TitleBar.Size = UDim2.new(1, 0, 0, 36)
+TitleBar.BackgroundColor3 = Color3.fromRGB(25, 5, 50)
+TitleBar.BorderSizePixel = 0
+Instance.new("UICorner", TitleBar).CornerRadius = UDim.new(0, 8)
+
+local TitleLabel = Instance.new("TextLabel", TitleBar)
+TitleLabel.Size = UDim2.new(1, -10, 1, 0)
+TitleLabel.Position = UDim2.new(0, 10, 0, 0)
+TitleLabel.BackgroundTransparency = 1
+TitleLabel.Text = "ðŸ’Ž KRYSTAL DANCE V2"
+TitleLabel.TextColor3 = Color3.fromRGB(200, 100, 255)
+TitleLabel.Font = Enum.Font.GothamBold
+TitleLabel.TextSize = 13
+TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+local RGBBar = Instance.new("Frame", Main)
+RGBBar.Size = UDim2.new(1, 0, 0, 2)
+RGBBar.Position = UDim2.new(0, 0, 0, 36)
+RGBBar.BackgroundColor3 = Color3.fromRGB(120, 0, 255)
+RGBBar.BorderSizePixel = 0
+
+local StatusFrame = Instance.new("Frame", Main)
+StatusFrame.Size = UDim2.new(1, -16, 0, 42)
+StatusFrame.Position = UDim2.new(0, 8, 0, 46)
+StatusFrame.BackgroundColor3 = Color3.fromRGB(5, 0, 15)
+StatusFrame.BorderSizePixel = 0
+Instance.new("UICorner", StatusFrame).CornerRadius = UDim.new(0, 5)
+
+local StatusStroke = Instance.new("UIStroke", StatusFrame)
+StatusStroke.Color = Color3.fromRGB(60, 0, 120)
+StatusStroke.Thickness = 1
+
+local StatusNowLabel = Instance.new("TextLabel", StatusFrame)
+StatusNowLabel.Size = UDim2.new(1, -10, 0, 14)
+StatusNowLabel.Position = UDim2.new(0, 8, 0, 5)
+StatusNowLabel.BackgroundTransparency = 1
+StatusNowLabel.Text = "NOW PLAYING"
+StatusNowLabel.TextColor3 = Color3.fromRGB(80, 40, 130)
+StatusNowLabel.Font = Enum.Font.Code
+StatusNowLabel.TextSize = 9
+StatusNowLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+local StatusName = Instance.new("TextLabel", StatusFrame)
+StatusName.Size = UDim2.new(1, -10, 0, 20)
+StatusName.Position = UDim2.new(0, 8, 0, 18)
+StatusName.BackgroundTransparency = 1
+StatusName.Text = "â€” None â€”"
+StatusName.TextColor3 = Color3.fromRGB(180, 80, 255)
+StatusName.Font = Enum.Font.GothamBold
+StatusName.TextSize = 13
+StatusName.TextXAlignment = Enum.TextXAlignment.Left
+
+local Dot = Instance.new("Frame", StatusFrame)
+Dot.Size = UDim2.new(0, 8, 0, 8)
+Dot.Position = UDim2.new(1, -18, 0.5, -4)
+Dot.BackgroundColor3 = Color3.fromRGB(50, 0, 80)
+Dot.BorderSizePixel = 0
+Instance.new("UICorner", Dot).CornerRadius = UDim.new(1, 0)
+
+local ScrollFrame = Instance.new("ScrollingFrame", Main)
+ScrollFrame.Size = UDim2.new(1, -16, 0, 200)
+ScrollFrame.Position = UDim2.new(0, 8, 0, 96)
+ScrollFrame.BackgroundTransparency = 1
+ScrollFrame.BorderSizePixel = 0
+ScrollFrame.ScrollBarThickness = 3
+ScrollFrame.ScrollBarImageColor3 = Color3.fromRGB(120, 0, 255)
+ScrollFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
+
+local GridLayout = Instance.new("UIGridLayout", ScrollFrame)
+GridLayout.CellSize = UDim2.new(0, 72, 0, 62)
+GridLayout.CellPadding = UDim2.new(0, 6, 0, 6)
+GridLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+GridLayout.SortOrder = Enum.SortOrder.LayoutOrder
+
+local DividerLabel = Instance.new("TextLabel", Main)
+DividerLabel.Size = UDim2.new(1, -16, 0, 18)
+DividerLabel.Position = UDim2.new(0, 8, 0, 302)
+DividerLabel.BackgroundTransparency = 1
+DividerLabel.Text = "â€” CUSTOM ANIMATIONS â€”"
+DividerLabel.TextColor3 = Color3.fromRGB(80, 40, 130)
+DividerLabel.Font = Enum.Font.Code
+DividerLabel.TextSize = 9
+DividerLabel.TextXAlignment = Enum.TextXAlignment.Center
+
+local CustomBtn = Instance.new("TextButton", Main)
+CustomBtn.Size = UDim2.new(1, -16, 0, 50)
+CustomBtn.Position = UDim2.new(0, 8, 0, 322)
+CustomBtn.BackgroundColor3 = Color3.fromRGB(15, 0, 35)
+CustomBtn.BorderSizePixel = 0
+CustomBtn.Text = ""
+CustomBtn.AutoButtonColor = false
+Instance.new("UICorner", CustomBtn).CornerRadius = UDim.new(0, 5)
+
+local CustomStroke = Instance.new("UIStroke", CustomBtn)
+CustomStroke.Color = Color3.fromRGB(80, 0, 160)
+CustomStroke.Thickness = 1
+
+local CustomKeyLabel = Instance.new("TextLabel", CustomBtn)
+CustomKeyLabel.Size = UDim2.new(0, 30, 1, 0)
+CustomKeyLabel.Position = UDim2.new(0, 10, 0, 0)
+CustomKeyLabel.BackgroundTransparency = 1
+CustomKeyLabel.Text = "Z"
+CustomKeyLabel.TextColor3 = Color3.fromRGB(120, 50, 220)
+CustomKeyLabel.Font = Enum.Font.GothamBold
+CustomKeyLabel.TextSize = 20
+
+local CustomNameLabel = Instance.new("TextLabel", CustomBtn)
+CustomNameLabel.Size = UDim2.new(1, -50, 0, 20)
+CustomNameLabel.Position = UDim2.new(0, 45, 0, 6)
+CustomNameLabel.BackgroundTransparency = 1
+CustomNameLabel.Text = "My Custom Anim"
+CustomNameLabel.TextColor3 = Color3.fromRGB(160, 80, 255)
+CustomNameLabel.Font = Enum.Font.GothamBold
+CustomNameLabel.TextSize = 13
+CustomNameLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+local CustomSubLabel = Instance.new("TextLabel", CustomBtn)
+CustomSubLabel.Size = UDim2.new(1, -50, 0, 14)
+CustomSubLabel.Position = UDim2.new(0, 45, 0, 28)
+CustomSubLabel.BackgroundTransparency = 1
+CustomSubLabel.Text = "ID: 94899889409913 â€¢ 55 keyframes"
+CustomSubLabel.TextColor3 = Color3.fromRGB(80, 40, 120)
+CustomSubLabel.Font = Enum.Font.Code
+CustomSubLabel.TextSize = 9
+CustomSubLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+local StopBtn = Instance.new("TextButton", Main)
+StopBtn.Size = UDim2.new(1, -16, 0, 28)
+StopBtn.Position = UDim2.new(0, 8, 1, -36)
+StopBtn.BackgroundColor3 = Color3.fromRGB(15, 5, 30)
+StopBtn.BorderSizePixel = 0
+StopBtn.Text = "â–  STOP DANCE"
+StopBtn.TextColor3 = Color3.fromRGB(80, 30, 130)
+StopBtn.Font = Enum.Font.GothamBold
+StopBtn.TextSize = 12
+Instance.new("UICorner", StopBtn).CornerRadius = UDim.new(0, 5)
+
+local StopStroke = Instance.new("UIStroke", StopBtn)
+StopStroke.Color = Color3.fromRGB(60, 0, 120)
+StopStroke.Thickness = 1
+
+local selectedBtn = nil
+local btnRefs = {}
+
+local function playAnimation(key)
+    if dancing then
+        stopDance()
+        if currentKey == key then
+            StatusName.Text = "â€” None â€”"
+            Dot.BackgroundColor3 = Color3.fromRGB(50, 0, 80)
+            if selectedBtn then
+                selectedBtn.BackgroundColor3 = Color3.fromRGB(15, 5, 30)
+                local refs = btnRefs[currentKey]
+                if refs then refs.stroke.Color = Color3.fromRGB(60, 0, 120) end
+            end
+            selectedBtn = nil
+            currentKey = nil
+            return
+        end
+    end
+    local anim = Animations[key]
+    if not anim then return end
+    dancing = true
+    currentKey = key
+    Humanoid.WalkSpeed = 0
+    StatusName.Text = anim.name
+    Dot.BackgroundColor3 = Color3.fromRGB(200, 50, 255)
+    coroutine.wrap(function()
+        anim.fn()
+        if currentSound then currentSound:Stop() currentSound:Destroy() currentSound = nil end
+        Humanoid.WalkSpeed = ws
+    end)()
+end
+
+local keyOrder = {"Q","E","R","T","Y","U","P","F","G","H","J","K"}
+for i, key in ipairs(keyOrder) do
+    local anim = Animations[key]
+    local Btn = Instance.new("TextButton", ScrollFrame)
+    Btn.Size = UDim2.new(0, 72, 0, 62)
+    Btn.BackgroundColor3 = Color3.fromRGB(15, 5, 30)
+    Btn.BorderSizePixel = 0
+    Btn.Text = ""
+    Btn.LayoutOrder = i
+    Btn.AutoButtonColor = false
+    Instance.new("UICorner", Btn).CornerRadius = UDim.new(0, 5)
+
+    local BtnStroke = Instance.new("UIStroke", Btn)
+    BtnStroke.Color = Color3.fromRGB(60, 0, 120)
+    BtnStroke.Thickness = 1
+
+    local KeyLabel = Instance.new("TextLabel", Btn)
+    KeyLabel.Size = UDim2.new(1, 0, 0, 28)
+    KeyLabel.Position = UDim2.new(0, 0, 0, 6)
+    KeyLabel.BackgroundTransparency = 1
+    KeyLabel.Text = key
+    KeyLabel.TextColor3 = Color3.fromRGB(100, 40, 180)
+    KeyLabel.Font = Enum.Font.GothamBold
+    KeyLabel.TextSize = 18
+
+    local NameLabel = Instance.new("TextLabel", Btn)
+    NameLabel.Size = UDim2.new(1, -4, 0, 24)
+    NameLabel.Position = UDim2.new(0, 2, 0, 34)
+    NameLabel.BackgroundTransparency = 1
+    NameLabel.Text = anim.name
+    NameLabel.TextColor3 = Color3.fromRGB(70, 30, 110)
+    NameLabel.Font = Enum.Font.Code
+    NameLabel.TextSize = 8
+    NameLabel.TextWrapped = true
+
+    btnRefs[key] = {btn = Btn, stroke = BtnStroke}
+
+    Btn.MouseButton1Click:Connect(function()
+        if selectedBtn and selectedBtn ~= Btn then
+            selectedBtn.BackgroundColor3 = Color3.fromRGB(15, 5, 30)
+            local refs = btnRefs[currentKey or ""]
+            if refs then refs.stroke.Color = Color3.fromRGB(60, 0, 120) end
+        end
+        selectedBtn = Btn
+        Btn.BackgroundColor3 = Color3.fromRGB(30, 5, 55)
+        BtnStroke.Color = Color3.fromRGB(180, 60, 255)
+        playAnimation(key)
+    end)
+
+    Btn.MouseEnter:Connect(function()
+        if selectedBtn ~= Btn then TweenService:Create(Btn, TweenInfo.new(0.1), {BackgroundColor3 = Color3.fromRGB(22, 8, 42)}):Play() end
+    end)
+    Btn.MouseLeave:Connect(function()
+        if selectedBtn ~= Btn then TweenService:Create(Btn, TweenInfo.new(0.1), {BackgroundColor3 = Color3.fromRGB(15, 5, 30)}):Play() end
+    end)
+end
+
+btnRefs["Z"] = {btn = CustomBtn, stroke = CustomStroke}
+CustomBtn.MouseButton1Click:Connect(function()
+    if selectedBtn and selectedBtn ~= CustomBtn then
+        selectedBtn.BackgroundColor3 = Color3.fromRGB(15, 5, 30)
+        local refs = btnRefs[currentKey or ""]
+        if refs then refs.stroke.Color = Color3.fromRGB(60, 0, 120) end
+    end
+    selectedBtn = CustomBtn
+    CustomBtn.BackgroundColor3 = Color3.fromRGB(30, 5, 60)
+    CustomStroke.Color = Color3.fromRGB(200, 80, 255)
+    playAnimation("Z")
+end)
+
+CustomBtn.MouseEnter:Connect(function()
+    if selectedBtn ~= CustomBtn then TweenService:Create(CustomBtn, TweenInfo.new(0.1), {BackgroundColor3 = Color3.fromRGB(22, 5, 45)}):Play() end
+end)
+CustomBtn.MouseLeave:Connect(function()
+    if selectedBtn ~= CustomBtn then TweenService:Create(CustomBtn, TweenInfo.new(0.1), {BackgroundColor3 = Color3.fromRGB(15, 0, 35)}):Play() end
+end)
+
+StopBtn.MouseButton1Click:Connect(function()
+    stopDance()
+    StatusName.Text = "â€” None â€”"
+    Dot.BackgroundColor3 = Color3.fromRGB(50, 0, 80)
+    if selectedBtn then
+        selectedBtn.BackgroundColor3 = Color3.fromRGB(15, 5, 30)
+        local refs = btnRefs[currentKey or ""]
+        if refs then refs.stroke.Color = Color3.fromRGB(60, 0, 120) end
+        selectedBtn = nil
+    end
+    currentKey = nil
+end)
+
+StopBtn.MouseEnter:Connect(function()
+    TweenService:Create(StopBtn, TweenInfo.new(0.1), {BackgroundColor3 = Color3.fromRGB(35,0,15), TextColor3 = Color3.fromRGB(255,60,100)}):Play()
+    StopStroke.Color = Color3.fromRGB(180,0,60)
+end)
+StopBtn.MouseLeave:Connect(function()
+    TweenService:Create(StopBtn, TweenInfo.new(0.1), {BackgroundColor3 = Color3.fromRGB(15,5,30), TextColor3 = Color3.fromRGB(80,30,130)}):Play()
+    StopStroke.Color = Color3.fromRGB(60,0,120)
+end)
+
+Mouse.KeyDown:Connect(function(key)
+    local k = key:upper()
+    if Animations[k] then
+        playAnimation(k)
+        local refs = btnRefs[k]
+        if refs then
+            if selectedBtn and selectedBtn ~= refs.btn then
+                selectedBtn.BackgroundColor3 = Color3.fromRGB(15, 5, 30)
+                local old = btnRefs[currentKey or ""]
+                if old then old.stroke.Color = Color3.fromRGB(60, 0, 120) end
+            end
+            selectedBtn = refs.btn
+            refs.btn.BackgroundColor3 = Color3.fromRGB(30, 5, 55)
+            refs.stroke.Color = Color3.fromRGB(180, 60, 255)
+        end
+    end
+end)
+
+RunService.RenderStepped:Connect(function()
+    sine = sine + change
+    local t = tick()
+    RGBBar.BackgroundColor3 = Color3.fromHSV((t * 0.1) % 1, 0.8, 1)
+    if dancing then
+        Dot.BackgroundColor3 = Color3.fromHSV(0.8, 0.8, 0.5 + 0.5 * math.sin(t * 4))
+    end
+end)
+
+print("Krystal Dance V2 Loaded!")
